@@ -73,7 +73,15 @@ public class GoogleDriveServiceImpl  implements GoogleDriveService{
         	System.out.println("File does not exist at path: " + file.getAbsolutePath());
         }
 
-        
+        String folderPath = "/etc/secrets"; // Update with your folder path
+        java.io.File folder = new java.io.File(folderPath);
+
+        // Check if the folder exists
+        if (folder.exists() && folder.isDirectory()) {
+            System.out.println("The folder exists.");
+        } else {
+            System.out.println("The folder does not exist.");
+        }
     }
 	
 	public Drive getDriveService() {
