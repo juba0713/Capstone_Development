@@ -101,7 +101,7 @@ public class GoogleDriveServiceImpl  implements GoogleDriveService{
 	  /**
 	   * Directory to store authorization tokens for this application.
 	   */
-	  private  final String TOKENS_DIRECTORY_PATH = "secrets";
+	  private  final String TOKENS_DIRECTORY_PATH = "/etc/secrets";
 
 	  /**
 	   * Global instance of the scopes required by this quickstart.
@@ -122,24 +122,22 @@ public class GoogleDriveServiceImpl  implements GoogleDriveService{
 	      throws IOException {
 		  
 	  
-	    // Load client secrets.
-	    InputStream in = GoogleDriveService.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-	    if (in == null) {
-	      throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
-	    }
-	    GoogleClientSecrets clientSecrets =
-	        GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+		  // Load client secrets from file system
+		    FileInputStream fileInputStream = new FileInputStream(CREDENTIALS_FILE_PATH);
+		    GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(fileInputStream));
 
-	    // Build flow and trigger user authorization request.
-	    GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-	        HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-	        .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
-	        .setAccessType("offline")
-	        .build();
-	    LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(googleServicePort).build();
-	    Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
-	    //returns an authorized Credential object.
-	    return credential;
+		    // Build flow and trigger user authorization request
+		    GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
+		        HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
+		        .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
+		        .setAccessType("offline")
+		        .build();
+
+		    LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(googleServicePort).build();
+		    Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+		    
+		    // returns an authorized Credential object
+		    return credential;
 	  }
 
 	  public Drive getInstance() throws GeneralSecurityException, IOException {
@@ -253,4 +251,6 @@ public class GoogleDriveServiceImpl  implements GoogleDriveService{
 	        e.printStackTrace();
 	    }
 	}
+	
+	
 }
