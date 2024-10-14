@@ -148,44 +148,44 @@ public class GoogleDriveServiceImpl  implements GoogleDriveService{
 	  
 	  
 	  
-//	  public InputStream  getFileContentByName(String fileName, Boolean isPdf) throws IOException, GeneralSecurityException {
-//		  
-//		// Retrieve the folder ID from properties
-//		    String folderId;
-//
-//		    // Check if we are dealing with PDFs or certificates
-//		    if (isPdf) {
-//		        folderId = env.getProperty("pdf.folder.id"); // ID for the pdfs folder
-//		    } else {
-//		        System.out.println("CERTIFICATE");
-//		        folderId = env.getProperty("certificate.folder.id"); // ID for the certificate folder
-//		    }
-//
-//		    Drive service = getInstance();
-//
-//		    // Search for the file by name within the specified folder
-//		    String query = "name = '" + fileName + "' and '" + folderId + "' in parents";
-//		    FileList result = service.files().list()
-//		            .setQ(query)
-//		            .setSpaces("drive")
-//		            .setFields("files(id, name)")
-//		            .execute();
-//
-//		    List<File> files = result.getFiles();
-//
-//		    if (files == null || files.isEmpty()) {
-//		        return null; // No files found
-//		    } else {
-//		        File file = files.get(0); // Get the first matching file
-//
-//		        // Return the InputStream for the file's content
-//		        return service.files().get(file.getId()).executeMediaAsInputStream();
-//		    }
-//		  }
-//
-//
-//	  public void uploadPdfFile(MultipartFile file, String fileName) {
-//		  
+	  public InputStream  getFileContentByName(String fileName, Boolean isPdf) throws IOException, GeneralSecurityException {
+		  
+		// Retrieve the folder ID from properties
+		    String folderId;
+
+		    // Check if we are dealing with PDFs or certificates
+		    if (isPdf) {
+		        folderId = env.getProperty("pdf.folder.id"); // ID for the pdfs folder
+		    } else {
+		        System.out.println("CERTIFICATE");
+		        folderId = env.getProperty("certificate.folder.id"); // ID for the certificate folder
+		    }
+
+		    Drive service = getInstance("sda");
+
+		    // Search for the file by name within the specified folder
+		    String query = "name = '" + fileName + "' and '" + folderId + "' in parents";
+		    FileList result = service.files().list()
+		            .setQ(query)
+		            .setSpaces("drive")
+		            .setFields("files(id, name)")
+		            .execute();
+
+		    List<File> files = result.getFiles();
+
+		    if (files == null || files.isEmpty()) {
+		        return null; // No files found
+		    } else {
+		        File file = files.get(0); // Get the first matching file
+
+		        // Return the InputStream for the file's content
+		        return service.files().get(file.getId()).executeMediaAsInputStream();
+		    }
+		  }
+
+
+	  public void uploadPdfFile(MultipartFile file, String fileName) {
+		  
 //		  String folderId = env.getProperty("pdf.folder.id");
 //		  
 //		    try {
@@ -214,11 +214,11 @@ public class GoogleDriveServiceImpl  implements GoogleDriveService{
 //		        System.err.println("Error uploading file: " + e.getMessage());
 //		        e.printStackTrace();
 //		    }
-//		}
-//
-//
-//	@Override
-//	public void uploadCertificateFile(java.io.File file, String fileName) {
+		}
+
+
+	@Override
+	public void uploadCertificateFile(java.io.File file, String fileName) {
 //		String folderId = env.getProperty("certificate.folder.id");
 //	    
 //	    try {
@@ -247,7 +247,7 @@ public class GoogleDriveServiceImpl  implements GoogleDriveService{
 //	        System.err.println("Error uploading file: " + e.getMessage());
 //	        e.printStackTrace();
 //	    }
-//	}
+	}
 	
 	
 }

@@ -13,9 +13,9 @@ import com.google.api.services.drive.Drive;
 @Service
 public interface GoogleDriveService {
 	
-//	public  InputStream  getFileContentByName(String fileName, Boolean isPdf)  throws IOException, GeneralSecurityException;
-//	
-//	public void uploadPdfFile(MultipartFile file, String fileName);
-//	
-//	public void uploadCertificateFile(java.io.File file, String fileName);
+	public  InputStream  getFileContentByName(String fileName, Boolean isPdf)  throws IOException, GeneralSecurityException;
+	
+	public void uploadPdfFile(MultipartFile file, String fileName);
+	
+	public void uploadCertificateFile(java.io.File file, String fileName);
 }
