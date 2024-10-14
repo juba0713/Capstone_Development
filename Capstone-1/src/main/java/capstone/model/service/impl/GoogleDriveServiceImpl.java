@@ -47,7 +47,7 @@ public class GoogleDriveServiceImpl  implements GoogleDriveService{
 	
 	private Drive driveService;
 	
-	private  final String CREDENTIALS_FILE_PATH = "./secrets/credential.json";
+	private  final String CREDENTIALS_FILE_PATH = "./etc/secrets/client_secret_1043115598106-4p08qcud5ccfosccf6q8hqov5cl5r0gu.apps.googleusercontent.com.json";
 	
 	@PostConstruct
     public void init() {
@@ -62,7 +62,7 @@ public class GoogleDriveServiceImpl  implements GoogleDriveService{
         
         System.out.println(googleServicePort);
         
-        java.io.File file = new java.io.File("./secrets/text.txt");
+        java.io.File file = new java.io.File("./etc/secrets/text.txt");
 
         if (file.exists()) {
             System.out.println("File exists.");
