@@ -88,7 +88,7 @@ public class GoogleDriveServiceImpl  implements GoogleDriveService{
 	  /**
 	   * Directory to store authorization tokens for this application.
 	   */
-	  private  final String TOKENS_DIRECTORY_PATH = "tokens";
+	  private  final String TOKENS_DIRECTORY_PATH = "secrets";
 
 	  /**
 	   * Global instance of the scopes required by this quickstart.
