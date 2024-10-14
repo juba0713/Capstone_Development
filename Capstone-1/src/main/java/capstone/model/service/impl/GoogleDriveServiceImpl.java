@@ -70,7 +70,7 @@ public class GoogleDriveServiceImpl  implements GoogleDriveService{
         if (file.exists()) {
             System.out.println("File exists.");
         } else {
-            System.out.println("File does not exist.");
+        	System.out.println("File does not exist at path: " + file.getAbsolutePath());
         }
 
         
