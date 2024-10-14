@@ -130,7 +130,7 @@ public class GoogleDriveServiceImpl  implements GoogleDriveService{
 		    GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
 		        HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
 		        .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
-		        .setAccessType("offline")
+		        .setAccessType("online")
 		        .build();
 
 		    LocalServerReceiver receiver = new LocalServerReceiver.Builder().setHost("capstone-development-vbli.onrender.com").setPort(googleServicePort).build();
