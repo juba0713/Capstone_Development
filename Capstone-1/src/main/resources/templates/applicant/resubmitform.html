@@ -1,0 +1,2532 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resubmit Form</title>
+
+    <link rel="stylesheet" href="/css/output.css" />
+    <link rel="stylesheet" href="/css/input.css" />
+
+    <style>
+      /* body,
+      html {
+        height: 100%;
+        margin: 0;
+        font-family: Arial, sans-serif;
+        overflow-x: hidden;
+      } */
+      * {
+        box-sizing: border-box;
+      }
+      .checklist {
+        background-color: #f1f1f1;
+        min-width: 300px;
+        padding: 40px;
+        position: fixed;
+        right: 0;
+        top: 0;
+        height: 100%;
+        overflow-y: auto;
+        padding-top: 80px;
+      }
+
+      input {
+        border: none;
+        height: 32px;
+        border-color: transparent;
+        background: transparent;
+        width: 100%;
+      }
+      input:focus {
+        outline: none;
+      }
+      input.invalid {
+        background-color: #ffdddd;
+      }
+
+      input[type="radio"] {
+        height: 40px;
+        width: auto;
+        transform: scale(1.5);
+        background: none;
+        margin-right: 8px;
+        margin-left: 4px;
+      }
+
+      .error {
+        padding-left: 20px;
+        font-size: 15px;
+        font-weight: 600;
+        color: #dc143c;
+      }
+
+      .no-pad {
+        padding: 0;
+      }
+
+      .error-container {
+        position: absolute;
+        top: 45px;
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .error-container div {
+        background: red;
+        color: #fff;
+        font-size: 20px;
+        font-weight: 600;
+        padding: 10px;
+        border-radius: 10px;
+      }
+
+      .details {
+        position: relative;
+      }
+
+      .text-sm {
+        text-align: center;
+      }
+
+      .font-20 {
+        font-size: 20px;
+        font-weight: bold;
+      }
+      .resubmit-back-button {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: hsl(48, 99%, 65%);
+        color: black;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 16px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s;
+      }
+
+      .resubmit-back-button:hover {
+        background-color: rgb(226 232 240);
+        color: black;
+      }
+    </style>
+  </head>
+  <body class="font-secondary" th:object="${applicantWebDto}">
+    <div class="h-20 sticky top-0 z-10 bg-opacity-5 backdrop-blur-[3px]">
+      <div
+        class="flex items-center justify-end h-full p-10 font-primary text-4xl text-center"
+      >
+        Resubmit Form
+      </div>
+      <a th:href="@{/officer/home}" class="ad-back-button">Back to home</a>
+    </div>
+    <!-- LEFT side -->
+    <div class="w-[55%] bg-white p-10 pt-2 details">
+      <div class="error-container" th:if="*{error != null}">
+        <div>Please fill out all required fields!</div>
+      </div>
+      <form
+        th:action="@{/applicant/form}"
+        method="POST"
+        id="regForm"
+        action=""
+        class="rounded-lg"
+        enctype="multipart/form-data"
+      >
+        <!-- page 2 -->
+        <div class="tab">
+          <h1
+            class="w-full bg-gradient-to-r from-[#E7BA05] to-customyellow font-semibold text-lg p-4 rounded-t-lg"
+          >
+            Project/Idea Details
+          </h1>
+          <div>
+            <div
+              class="flex flex-col ml-6 w-2/4 relative border-b border-gray-200 bg-transparent pt-3 focus-within:border-blue-600"
+            >
+              <h2 class="text-black mb-3">
+                Project Title/Startup Name<span class="text-red-600"> *</span>
+              </h2>
+              <input
+                required
+                oninput="this.className = 'text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm'"
+                placeholder="Enter Project title"
+                name="projectTitle"
+                th:value="*{projectTitle}"
+                class="text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+              />
+            </div>
+            <div
+              class="error"
+              th:if="*{error != null} AND *{error.projectTitleError != null}"
+            >
+              <div
+                th:each="err : *{error.projectTitleError}"
+                th:text="${err}"
+              ></div>
+            </div>
+
+            <hr class="my-8" />
+
+            <!-- capsule proposal form -->
+            <div class="flex flex-col mt-4 mb-3 mx-6">
+              <p class="mb-3 font-semibold text-base">
+                I. About the Startup/Project
+              </p>
+              <!-- project description -->
+              <h2 class="text-black">
+                A. Project Description<span class="text-red-600"> *</span>
+              </h2>
+              <textarea
+                oninput="this.className = 'resize-none mt-2 bg-white w-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm h-20 '"
+                type="text"
+                placeholder="Type something here..."
+                name="projectDescription"
+                th:text="*{projectDescription}"
+                class="resize-none mt-2 bg-white w-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm h-20"
+              ></textarea>
+              <div
+                class="error no-pad"
+                th:if="*{error != null} AND *{error.projectDescriptionError != null}"
+              >
+                <div
+                  th:each="err : *{error.projectDescriptionError}"
+                  th:text="${err}"
+                ></div>
+              </div>
+              <small class="block mt-2 text-gray-500">
+                • Maximum of 100 words<br />
+                • If a startup, describe the nature of the business including
+                the product or service offering.<br />
+                • If a project, provide a detailed description or statement
+                about the subject, program, competition, or initiative that
+                initiated this project.
+              </small>
+
+              <hr class="my-4" />
+
+              <!-- team composition -->
+              <div>
+                <h2 class="text-black">B. Team Composition</h2>
+                <!-- B. Team Composition<span class="text-red-600"> *</span> -->
+                <div class="grid grid-cols-2 w-4/5 gap-2 mt-2">
+                  <div>Name</div>
+                  <div>Position/Role</div>
+                </div>
+
+                <div class="mb-3 mt-3 gap-3 grid grid-cols-2 w-4/5 relative">
+                  <div
+                    class="flex flex-col relative border-b border-gray-200 bg-transparent pt-3 focus-within:border-blue-600"
+                  >
+                    <input
+                      oninput="this.className = ''"
+                      name="teams[0][0]"
+                      th:value="*{teams[0][0]}"
+                      type="text"
+                      placeholder="Last Name, First Name"
+                      class="text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+                    />
+                  </div>
+                  <div
+                    class="flex flex-col relative border-b border-gray-200 bg-transparent pt-3 focus-within:border-blue-600"
+                  >
+                    <input
+                      name="teams[0][1]"
+                      th:value="*{teams[0][1]}"
+                      oninput="this.className = ''"
+                      type="text"
+                      placeholder="Input position/role"
+                      class="text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+                    />
+                  </div>
+                  <div
+                    class="flex flex-col relative border-b border-gray-200 bg-transparent pt-3 focus-within:border-blue-600"
+                  >
+                    <input
+                      oninput="this.className = ''"
+                      name="teams[1][0]"
+                      th:value="*{teams[1][0]}"
+                      type="text"
+                      placeholder="Last Name, First Name"
+                      class="text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+                    />
+                  </div>
+                  <div
+                    class="flex flex-col relative border-b border-gray-200 bg-transparent pt-3 focus-within:border-blue-600"
+                  >
+                    <input
+                      name="teams[1][1]"
+                      th:value="*{teams[1][1]}"
+                      oninput="this.className = ''"
+                      type="text"
+                      placeholder="Input position/role"
+                      class="text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+                    />
+                  </div>
+                  <div
+                    class="flex flex-col relative border-b border-gray-200 bg-transparent pt-3 focus-within:border-blue-600"
+                  >
+                    <input
+                      oninput="this.className = ''"
+                      name="teams[2][0]"
+                      th:value="*{teams[2][0]}"
+                      type="text"
+                      placeholder="Last Name, First Name"
+                      class="text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+                    />
+                  </div>
+                  <div
+                    class="flex flex-col relative border-b border-gray-200 bg-transparent pt-3 focus-within:border-blue-600"
+                  >
+                    <input
+                      name="teams[2][1]"
+                      th:value="*{teams[2][1]}"
+                      oninput="this.className = ''"
+                      type="text"
+                      placeholder="Input position/role"
+                      class="text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+                    />
+                  </div>
+                  <div
+                    class="flex flex-col relative border-b border-gray-200 bg-transparent pt-3 focus-within:border-blue-600"
+                  >
+                    <input
+                      oninput="this.className = ''"
+                      name="teams[3][0]"
+                      th:value="*{teams[3][0]}"
+                      type="text"
+                      placeholder="Last Name, First Name"
+                      class="text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+                    />
+                  </div>
+                  <div
+                    class="flex flex-col relative border-b border-gray-200 bg-transparent pt-3 focus-within:border-blue-600"
+                  >
+                    <input
+                      name="teams[3][1]"
+                      th:value="*{teams[3][1]}"
+                      oninput="this.className = ''"
+                      type="text"
+                      placeholder="Input position/role"
+                      class="text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+                    />
+                  </div>
+                  <div
+                    class="flex flex-col relative border-b border-gray-200 bg-transparent pt-3 focus-within:border-blue-600"
+                  >
+                    <input
+                      oninput="this.className = ''"
+                      name="teams[4][0]"
+                      th:value="*{teams[4][0]}"
+                      type="text"
+                      placeholder="Last Name, First Name"
+                      class="text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+                    />
+                  </div>
+                  <div
+                    class="flex flex-col relative border-b border-gray-200 bg-transparent pt-3 focus-within:border-blue-600"
+                  >
+                    <input
+                      name="teams[4][1]"
+                      th:value="*{teams[4][1]}"
+                      oninput="this.className = ''"
+                      type="text"
+                      placeholder="Input position/role"
+                      class="text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div
+                class="error no-pad"
+                th:if="*{error != null} AND *{error.teamsError != null}"
+              >
+                <div th:each="err : *{error.teamsError}" th:text="${err}"></div>
+              </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <!--  About the Product/Solution -->
+            <div class="ml-6">
+              <h2 class="text-black">C. About the Product/Solution</h2>
+
+              <p class="text-sm mt-4 flex justify-start">
+                1. Problem Statement<span class="text-red-600"> *</span>
+              </p>
+              <textarea
+                oninput="this.className = 'resize-none mt-2 bg-white w-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm h-20 z-10'"
+                placeholder="Type something here..."
+                name="problemStatement"
+                th:text="*{problemStatement}"
+                class="resize-none mt-2 bg-white w-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm h-20 z-10"
+              ></textarea>
+              <div
+                class="error no-pad"
+                th:if="*{error != null} AND *{error.problemStatementError != null}"
+              >
+                <div
+                  th:each="err : *{error.problemStatementError}"
+                  th:text="${err}"
+                ></div>
+              </div>
+              <small class="block text-gray-500">
+                • Maximum of 200 words<br />
+                • Provide the context of the problem.
+              </small>
+
+              <div>
+                <p class="text-sm mt-4 flex justify-start">
+                  2. Target Market<span class="text-red-600"> *</span>
+                </p>
+                <textarea
+                  placeholder="Type something here..."
+                  name="targetMarket"
+                  th:text="*{targetMarket}"
+                  class="resize-none mt-2 bg-white w-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm h-20 z-10"
+                ></textarea>
+                <div
+                  class="error no-pad"
+                  th:if="*{error != null} AND *{error.targetMarketError != null}"
+                >
+                  <div
+                    th:each="err : *{error.targetMarketError}"
+                    th:text="${err}"
+                  ></div>
+                </div>
+                <small class="block text-gray-500">
+                  • Maximum of 100 words<br />
+                  • Specify the user/customer segment that will benefit from the
+                  product/project.<br />
+                  • Specify the size of the market
+                </small>
+              </div>
+              <div>
+                <p class="text-sm mt-4 flex justify-start">
+                  3. Solution Description<span class="text-red-600"> *</span>
+                </p>
+
+                <textarea
+                  placeholder="Type something here..."
+                  name="solutionDescription"
+                  th:text="*{solutionDescription}"
+                  class="resize-none mt-2 bg-white w-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm h-20"
+                ></textarea>
+                <div
+                  class="error no-pad"
+                  th:if="*{error != null} AND *{error.solutionDescriptionError != null}"
+                >
+                  <div
+                    th:each="err : *{error.solutionDescriptionError}"
+                    th:text="${err}"
+                  ></div>
+                  <small class="block text-gray-500">
+                    • Maximum of 500 words<br />
+                    • Describe the Solution: Provide a detailed description of
+                    the solution, including its key features and
+                    functionalities.<br />
+                    • Address the Problem: State how the solution effectively
+                    addressed the problem statement.<br />
+                    • Highlight Value Proposition or Innovation: Emphasize the
+                    unique aspects or innovative elements of your solution.
+                  </small>
+                </div>
+              </div>
+              <hr class="my-4" />
+
+              <!-- historical timeline -->
+              <div>
+                <h2 class="text-black">
+                  D. Historical Timeline of the Product/Project Development
+                </h2>
+                <small class="block text-gray-500">
+                  • Start from the most recent
+                </small>
+                <table class="w-full">
+                  <thead>
+                    <tr>
+                      <th
+                        class="font-semibold border border-gray-500 px-4 py-2"
+                      >
+                        Month-Year
+                      </th>
+                      <th
+                        class="font-semibold border border-gray-500 px-4 py-2"
+                      >
+                        Key Activities or Milestones
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="border border-gray-500 px-4 py-2">
+                        <input
+                          oninput="this.className = 'w-full h-12 focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1'"
+                          type="text"
+                          name="historicalTimeline[0][0]"
+                          th:value="*{historicalTimeline[0].length != 0 ? historicalTimeline[0][0] : ''}"
+                          placeholder="mm/yyyy"
+                          class="w-full h-12 focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1"
+                        />
+                      </td>
+                      <td class="border border-gray-500 px-4 py-2">
+                        <textarea
+                          type="text"
+                          oninput="this.className = 'resize-none w-full h-20 border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm'"
+                          name="historicalTimeline[0][1]"
+                          th:text="*{historicalTimeline[0].length != 0 ? historicalTimeline[0][1] : ''}"
+                          placeholder="Enter key activities or milestones here"
+                          class="resize-none w-full h-20 border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="border border-gray-500 px-4 py-2">
+                        <input
+                          oninput="this.className = 'w-full h-12 focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1'"
+                          type="text"
+                          name="historicalTimeline[1][0]"
+                          th:value="*{historicalTimeline[1].length != 0 ? historicalTimeline[1][0] : ''}"
+                          placeholder="mm/yyyy"
+                          class="w-full h-12 focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1"
+                        />
+                      </td>
+                      <td class="border border-gray-500 px-4 py-2">
+                        <textarea
+                          type="text"
+                          oninput="this.className = 'resize-none w-full h-20 border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm'"
+                          name="historicalTimeline[1][1]"
+                          th:text="*{historicalTimeline[1].length != 0 ? historicalTimeline[1][1] : ''}"
+                          placeholder="Enter key activities or milestones here"
+                          class="resize-none w-full h-20 border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="border border-gray-500 px-4 py-2">
+                        <input
+                          oninput="this.className = 'w-full h-12 focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1'"
+                          type="text"
+                          name="historicalTimeline[2][0]"
+                          th:value="*{historicalTimeline[2].length != 0 ? historicalTimeline[2][0] : ''}"
+                          placeholder="mm/yyyy"
+                          class="w-full h-12 focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1"
+                        />
+                      </td>
+                      <td class="border border-gray-500 px-4 py-2">
+                        <textarea
+                          type="text"
+                          oninput="this.className = 'resize-none w-full h-20 border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm'"
+                          name="historicalTimeline[2][1]"
+                          th:text="*{historicalTimeline[2].length != 0 ? historicalTimeline[2][1] : ''}"
+                          placeholder="Enter key activities or milestones here"
+                          class="resize-none w-full h-20 border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="border border-gray-500 px-4 py-2">
+                        <input
+                          oninput="this.className = 'w-full h-12 focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1'"
+                          type="text"
+                          name="historicalTimeline[3][0]"
+                          th:value="*{historicalTimeline[3].length != 0 ? historicalTimeline[3][0] : ''}"
+                          placeholder="mm/yyyy"
+                          class="w-full h-12 focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1"
+                        />
+                      </td>
+                      <td class="border border-gray-500 px-4 py-2">
+                        <textarea
+                          type="text"
+                          oninput="this.className = 'resize-none w-full h-20 border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm'"
+                          name="historicalTimeline[3][1]"
+                          th:text="*{historicalTimeline[3].length != 0 ? historicalTimeline[3][1] : ''}"
+                          placeholder="Enter key activities or milestones here"
+                          class="resize-none w-full h-20 border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="border border-gray-500 px-4 py-2">
+                        <input
+                          oninput="this.className = 'w-full h-12 focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1'"
+                          type="text"
+                          name="historicalTimeline[4][0]"
+                          th:value="*{historicalTimeline[4].length != 0 ? historicalTimeline[4][0] : ''}"
+                          placeholder="mm/yyyy"
+                          class="w-full h-12 focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1"
+                        />
+                      </td>
+                      <td class="border border-gray-500 px-4 py-2">
+                        <textarea
+                          type="text"
+                          oninput="this.className = 'resize-none w-full h-20 border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm'"
+                          name="historicalTimeline[4][1]"
+                          th:text="*{historicalTimeline[4].length != 0 ? historicalTimeline[4][1] : ''}"
+                          placeholder="Enter key activities or milestones here"
+                          class="resize-none w-full h-20 border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div
+                class="error no-pad"
+                th:if="*{error != null} AND *{error.historicalTimelineError != null}"
+              >
+                <div
+                  th:each="err : *{error.historicalTimelineError}"
+                  th:text="${err}"
+                ></div>
+              </div>
+              <hr class="my-4" />
+
+              <!-- competitive advantage analysis -->
+              <div class="overflow-x-auto h-[550px]">
+                <h2 class="text-black">E. Competitive Advantage Analysis</h2>
+                <small class="block text-gray-500">
+                  • Add more applicable competitive factors
+                </small>
+                <table class="w-full h-[90%]">
+                  <thead>
+                    <tr>
+                      <th
+                        class="w-1/5 font-semibold border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Competitive Factors
+                      </th>
+                      <th
+                        class="w-1/5 font-semibold border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Name of Competition 1/ Alternative 1
+                      </th>
+                      <th
+                        class="w-1/5 font-semibold border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Name of Competition 2/ Alternative 2
+                      </th>
+                      <th
+                        class="w-1/5 font-semibold border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Name of Competition 3/ Alternative 3
+                      </th>
+                      <th
+                        class="w-1/5 font-semibold border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Your Startup/Project Name
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th
+                        class="font-normal border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Product/Service Offering
+                      </th>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <!-- oninput="this.className = ''" -->
+                        <textarea
+                          oninput="this.className = 'resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm'"
+                          name="productServiceOffering[0]"
+                          th:text="*{productServiceOffering[0]}"
+                          placeholder="Enter product/service offering"
+                          class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <textarea
+                          oninput="this.className = 'resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm'"
+                          name="productServiceOffering[1]"
+                          th:text="*{productServiceOffering[1]}"
+                          placeholder="Enter product/service offering"
+                          class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <textarea
+                          oninput="this.className = 'resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm'"
+                          name="productServiceOffering[2]"
+                          th:text="*{productServiceOffering[2]}"
+                          placeholder="Enter product/service offering"
+                          class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <textarea
+                          oninput="this.className = 'resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm'"
+                          name="productServiceOffering[3]"
+                          th:text="*{productServiceOffering[3]}"
+                          placeholder="Enter product/service offering"
+                          class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th
+                        class="font-normal border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Pricing Strategy
+                      </th>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <textarea
+                          oninput="this.className = 'resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm'"
+                          name="pricingStrategy[0]"
+                          th:text="*{pricingStrategy[0]}"
+                          placeholder="Enter pricing strategy"
+                          class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <textarea
+                          oninput="this.className = 'resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm'"
+                          name="pricingStrategy[1]"
+                          th:text="*{pricingStrategy[1]}"
+                          placeholder="Enter pricing strategy"
+                          class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <textarea
+                          oninput="this.className = 'resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm'"
+                          name="pricingStrategy[2]"
+                          th:text="*{pricingStrategy[2]}"
+                          placeholder="Enter pricing strategy"
+                          class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <textarea
+                          oninput="this.className = 'resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm'"
+                          name="pricingStrategy[3]"
+                          th:text="*{pricingStrategy[3]}"
+                          placeholder="Enter pricing strategy"
+                          class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div
+                class="error no-pad"
+                th:if="*{error != null} AND *{error.productServiceOfferingError != null}"
+              >
+                <div
+                  th:each="err : *{error.productServiceOfferingError}"
+                  th:text="${err}"
+                ></div>
+              </div>
+              <hr class="my-4" />
+
+              <!-- intellectual property status -->
+              <div>
+                <h2 class="text-black">
+                  F. Intellectual Property Status (If applicable)
+                </h2>
+
+                <textarea
+                  oninput="this.className = 'resize-none w-full h-20 border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm'"
+                  type="text"
+                  placeholder="Type something here..."
+                  name="intPropertyStatus"
+                  th:value="*{intPropertyStatus}"
+                  class="resize-none w-full h-20 border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                ></textarea>
+              </div>
+            </div>
+            <hr class="my-8" />
+
+            <!-- About the Proposed Acceleration -->
+            <div class="flex flex-col mt-4 mb-3 ml-6">
+              <p class="mb-3 font-semibold text-base">
+                II. About the Proposed Acceleration
+              </p>
+              <!-- objectives -->
+              <h2 class="text-black">
+                A. Objectives<span class="text-red-600"> *</span>
+              </h2>
+              <textarea
+                oninput="this.className = 'resize-none mt-2 bg-white w-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm h-20 z-10'"
+                type="text"
+                placeholder="Type something here..."
+                name="objectives"
+                th:text="*{objectives}"
+                class="resize-none mt-2 bg-white w-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm h-20 z-10"
+              ></textarea>
+              <div
+                class="error no-pad"
+                th:if="*{error != null} AND *{error.ObjectivesError != null}"
+              >
+                <div
+                  th:each="err : *{error.ObjectivesError}"
+                  th:text="${err}"
+                ></div>
+              </div>
+              <small class="block text-gray-500">
+                • Maximum of 50 words<br />
+                • Provide 3 main objectives of the proposed acceleration.<br />
+                • The readiness level must be specified.
+              </small>
+
+              <hr class="my-4" />
+
+              <!-- scope of proposal -->
+              <div>
+                <h2 class="text-black">
+                  B. Scope of The Proposal
+                  <span class="text-red-600"> *</span>
+                </h2>
+
+                <textarea
+                  placeholder="Type something here..."
+                  name="scopeProposal"
+                  th:text="*{scopeProposal}"
+                  class="resize-none mt-2 bg-white w-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm h-20 z-10"
+                ></textarea>
+                <div
+                  class="error no-pad"
+                  th:if="*{error != null} AND *{error.scopeProposalError != null}"
+                >
+                  <div
+                    th:each="err : *{error.scopeProposalError}"
+                    th:text="${err}"
+                  ></div>
+                </div>
+                <small class="block text-gray-500">
+                  • Maximum of 50 words<br />
+                  • State the focus of the proposal
+                </small>
+              </div>
+              <hr class="my-4" />
+
+              <!-- methodology and expected outputs -->
+              <div>
+                <h2 class="text-black">
+                  C. Methodology and Expected Outputs
+                  <span class="text-red-600"> *</span>
+                </h2>
+
+                <textarea
+                  placeholder="Type something here..."
+                  name="methodology"
+                  th:text="*{methodology}"
+                  class="resize-none mt-2 bg-white w-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm h-20 z-10"
+                ></textarea>
+                <div
+                  class="error no-pad"
+                  th:if="*{error != null} AND *{error.methodologyError != null}"
+                >
+                  <div
+                    th:each="err : *{error.methodologyError}"
+                    th:text="${err}"
+                  ></div>
+                </div>
+                <small class="block text-gray-500">
+                  • Maximum of 300 words<br />
+                  • State the focus of the proposal
+                </small>
+              </div>
+            </div>
+            <hr class="my-8" />
+
+            <!-- Curriculum Vitae of the Project Leader
+ -->
+            <div id="cvProjectLeader" class="flex flex-col mt-4 mb-3 mx-6">
+              <p class="mb-3 font-semibold text-base">
+                III. Curriculum Vitae of the Project Leader
+              </p>
+              <!-- curriculum vitae -->
+              <h2 class="text-black">
+                Curriculum Vitae of the Project Leader<span
+                  class="text-red-600"
+                >
+                  *</span
+                >
+              </h2>
+              <div class="mt-3 w-[50%]">
+                <input type="file" name="vitaeFile" />
+                <span class="text-xs"
+                  >Submit your file in
+                  <span class="font-bold"> PDF </span> format.</span
+                >
+              </div>
+              <div
+                class="error no-pad"
+                th:if="*{error != null} AND *{error.vitaeFileError != null}"
+              >
+                <div
+                  th:each="err : *{error.vitaeFileError}"
+                  th:text="${err}"
+                ></div>
+              </div>
+              <div class="text-blue-500">
+                <div class="mt-2">Current File</div>
+                <div class="hover:underline">
+                  <a
+                    th:href="@{/view/} + *{vitaeFileName}"
+                    target="_blank"
+                    th:text="*{vitaeFileName} + ' (Click to view)'"
+                  ></a>
+                  <input
+                    type="hidden"
+                    name="vitaeFileName"
+                    th:value="*{vitaeFileName}"
+                  />
+                </div>
+              </div>
+            </div>
+            <hr class="my-8" />
+
+            <!-- links to any supporting materials -->
+
+            <div
+              class="mb-3 flex flex-col mx-6 w-4/5 relative border-b border-gray-200 bg-transparent pt-3 focus-within:border-blue-600"
+            >
+              <h2 class="text-black mb-3">
+                Links to any supporting materials
+                <!-- <span class="text-red-600"> *</span> -->
+              </h2>
+              <input
+                type="text"
+                placeholder="Input here"
+                name="supportLink"
+                th:value="*{supportLink}"
+                class="text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="tab mb-3">
+          <h1
+            class="w-full bg-gradient-to-r from-formbg-dark to-formbg-light font-semibold text-lg p-4 rounded-t-lg"
+          >
+            Group Info
+          </h1>
+          <div>
+            <div class="ml-6">
+              <div
+                class="flex flex-col w-2/4 relative border-b border-gray-200 bg-transparent pt-3 focus-within:border-blue-600"
+              >
+                <h2 class="text-black mb-3">
+                  Group Name<span class="text-red-600"> *</span>
+                </h2>
+                <input
+                  type="text"
+                  required
+                  oninput="this.className = ''"
+                  placeholder="Input here"
+                  name="groupName"
+                  th:value="*{groupName}"
+                  class="text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+                />
+                <div
+                  class="error no-pad"
+                  th:if="*{error != null} AND *{error.groupNameError != null}"
+                >
+                  <div
+                    th:each="err : *{error.groupNameError}"
+                    th:text="${err}"
+                  ></div>
+                </div>
+              </div>
+            </div>
+            <hr class="my-4" />
+            <div class="ml-6">
+              <div
+                class="flex flex-col w-2/4 relative border-b border-gray-200 bg-transparent pt-3 focus-within:border-blue-600"
+              >
+                <h2 class="text-black mb-3">
+                  Team Leader - Team Member 1 (Last Name, First Name)<span
+                    class="text-red-600"
+                  >
+                    *</span
+                  >
+                </h2>
+                <input
+                  type="text"
+                  required
+                  oninput="this.className = ''"
+                  placeholder="Input here"
+                  name="groupLeader"
+                  th:value="*{groupLeader}"
+                  class="text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+                />
+                <div
+                  class="error no-pad"
+                  th:if="*{error != null} AND *{error.groupLeaderError != null}"
+                >
+                  <div
+                    th:each="err : *{error.groupLeaderError}"
+                    th:text="${err}"
+                  ></div>
+                </div>
+              </div>
+            </div>
+            <hr class="my-4" />
+            <div class="ml-6">
+              <div
+                class="flex flex-col w-2/4 relative border-b border-gray-200 bg-transparent pt-3 focus-within:border-blue-600"
+              >
+                <h2 class="text-black mb-3">
+                  Team Leader's <strong> Mobile Number </strong>
+                  <span class="text-red-600"> *</span>
+                </h2>
+                <input
+                  type="text"
+                  required
+                  oninput="this.className = ''"
+                  placeholder="Input here"
+                  name="leaderNumber"
+                  th:value="*{leaderNumber}"
+                  class="text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+                />
+                <div
+                  class="error no-pad"
+                  th:if="*{error != null} AND *{error.leaderNumberError != null}"
+                >
+                  <div
+                    th:each="err : *{error.leaderNumberError}"
+                    th:text="${err}"
+                  ></div>
+                </div>
+              </div>
+            </div>
+            <hr class="my-4" />
+            <div class="ml-6">
+              <div
+                class="flex flex-col w-2/4 relative border-b border-gray-200 bg-transparent pt-3 focus-within:border-blue-600"
+              >
+                <h2 class="text-black mb-3">
+                  Team Leader's
+                  <strong>Address </strong>
+                  <span class="text-red-600"> *</span>
+                </h2>
+                <input
+                  type="text"
+                  required
+                  oninput="this.className = ''"
+                  placeholder="Input here"
+                  name="leaderAddress"
+                  th:value="*{leaderAddress}"
+                  class="text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+                />
+                <div
+                  class="error no-pad"
+                  th:if="*{error != null} AND *{error.leaderAddressError != null}"
+                >
+                  <div
+                    th:each="err : *{error.leaderAddressError}"
+                    th:text="${err}"
+                  ></div>
+                </div>
+              </div>
+            </div>
+            <hr class="my-4" />
+            <div
+              class="flex flex-col ml-6 w-2/4 relative border-b border-gray-200 bg-transparent pt-3 focus-within:border-blue-600"
+            >
+              <h2 class="text-black mb-3">
+                Team Member 2 (Last Name, First Name)
+
+                <span class="text-red-600"> *</span>
+              </h2>
+              <input
+                type="text"
+                required
+                oninput="this.className = ''"
+                placeholder="Input here"
+                name="members[0]"
+                th:value="*{#lists.size(members) >= 1 AND members[0] != 'null, null' ? members[0] : ''}"
+                class="text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+              />
+            </div>
+            <div
+              class="flex flex-col ml-6 w-2/4 relative border-b border-gray-200 bg-transparent pt-3 focus-within:border-blue-600"
+            >
+              <h2 class="text-black mb-3">
+                Team Member 3 (Last Name, First Name)
+
+                <span class="text-red-600"> *</span>
+              </h2>
+              <input
+                type="text"
+                required
+                oninput="this.className = ''"
+                placeholder="Input here"
+                name="members[1]"
+                th:value="*{#lists.size(members) >= 2 AND members[0] != 'null, null'  ? members[1] : ''}"
+                class="text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+              />
+            </div>
+            <div
+              class="flex flex-col ml-6 w-2/4 relative border-b border-gray-200 bg-transparent pt-3 focus-within:border-blue-600"
+            >
+              <h2 class="text-black mb-3">
+                Team Member 4 (Last Name, First Name)
+
+                <span class="text-red-600"> *</span>
+              </h2>
+              <input
+                type="text"
+                required
+                oninput="this.className = ''"
+                placeholder="Input here"
+                name="members[2]"
+                th:value="*{#lists.size(members) >= 3 AND members[0] != 'null, null' ? members[2] : ''}"
+                class="text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+              />
+            </div>
+            <div
+              class="flex flex-col ml-6 w-2/4 relative border-b border-gray-200 bg-transparent pt-3 focus-within:border-blue-600"
+            >
+              <h2 class="text-black mb-3">
+                Team Member 5 (Last Name, First Name)
+
+                <span class="text-red-600"> *</span>
+              </h2>
+              <input
+                type="text"
+                required
+                oninput="this.className = ''"
+                placeholder="Input here"
+                name="members[3]"
+                th:value="*{#lists.size(members) >= 4 AND members[0] != 'null, null' ? members[3] : ''}"
+                class="text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+              />
+            </div>
+
+            <hr class="my-4" />
+            <div class="relative pt-3 ml-6 mb-3">
+              <h2 class="text-black mb-3">
+                University
+                <span class="text-red-600"> *</span>
+              </h2>
+              <small class="block w-full mb-2">
+                If this is a school project, please provide the full name of
+                your organization. Do not use acronyms. Otherwise, put
+                <strong>NA</strong>
+              </small>
+              <div
+                class="flex flex-col w-2/4 relative border-b border-gray-200 bg-transparent focus-within:border-blue-600"
+              >
+                <input
+                  type="text"
+                  required
+                  oninput="this.className = 'w-full text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm'"
+                  placeholder="Input here"
+                  name="university"
+                  th:value="*{university}"
+                  class="w-full text-black border-none p-0 focus:outline-none focus:ring-0 sm:text-sm"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- page 4 -->
+        <!-- Technology and Commercialization Readiness Level
+ -->
+        <div class="tab mb-3">
+          <h1
+            class="w-full bg-gradient-to-r from-formbg-dark to-formbg-light font-semibold text-lg p-4 rounded-t-lg"
+          >
+            Technology and Commercialization Readiness Level
+          </h1>
+          <div
+            class="pt-3 flex flex-col w-full relative border-gray-200 bg-transparent focus-within:border-blue-600"
+          >
+            <h2 class="text-black ml-6 pr-3">
+              This form, adopted from NYSERDA, assists emerging and growing
+              companies in determining the technical and commercial maturity of
+              their products or innovations. It utilizes a customized and
+              integrated tool that measures both the Technology Readiness Level
+              (TRL) and Commercial Readiness Level (CRL). This TRL/CRL tool is
+              based on systems developed by NASA, DOE, and ARPA-E. Although it
+              has been specifically designed for ventures in the clean energy
+              industry, it has also been widely used in solutions and ventures
+              across various other industries. For each category, please select
+              the option that best describes the current status of your product,
+              solution, or innovation.<br /><br />
+              For each category, please select the option that best describes
+              the current status of your product, solution, or innovation.
+            </h2>
+          </div>
+          <hr class="my-3" />
+          <div class="border-red-500">
+            <div class="ml-6 pr-2 text-sm text-left">
+              <div class="flex justify-start">
+                <h2 class="text-black mb-3 text-base">
+                  Technology <span class="text-red-600"> *</span>
+                </h2>
+              </div>
+
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="technologyAns"
+                    value="1"
+                    th:checked="*{technologyAns==1}"
+                  />
+                  <p>
+                    Project work is beyond basic research and technology concept
+                    has been defined
+                  </p></label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="technologyAns"
+                    value="2"
+                    th:checked="*{technologyAns==2}"
+                  />
+                  <p>
+                    Applied research has begun and practical application(s) have
+                    been identified
+                  </p></label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="technologyAns"
+                    value="3"
+                    th:checked="*{technologyAns==3}"
+                  />
+                  <p>
+                    Preliminary testing of technology components has begun, and
+                    technical feasibility has been established in a laboratory
+                    environment
+                  </p></label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="technologyAns"
+                    value="4"
+                    th:checked="*{technologyAns==4}"
+                  />
+                  Initial testing of integrated product/system has been
+                  completed in a laboratory environment
+                </label>
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="technologyAns"
+                    value="5"
+                    th:checked="*{technologyAns==5}"
+                  />
+                  Laboratory scale integrated product/system demonstrates
+                  performance in the intended application(s)
+                </label>
+              </div>
+            </div>
+
+            <hr class="my-3" />
+            <div class="ml-6 text-sm">
+              <div class="flex justify-start">
+                <h2 class="text-black mb-3 text-base">
+                  Product Development <span class="text-red-600"> *</span>
+                </h2>
+              </div>
+
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="productDevelopmentAns"
+                    value="1"
+                    th:checked="*{productDevelopmentAns==1}"
+                  />
+                  Initial product/market fit has been defined</label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="productDevelopmentAns"
+                    value="2"
+                    th:checked="*{productDevelopmentAns==2}"
+                  />
+                  Pilot scale product/system has been tested in the intended
+                  application(s)</label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="productDevelopmentAns"
+                    value="3"
+                    th:checked="*{productDevelopmentAns==3}"
+                  />
+                  Demonstration of a full scale product/system prototype has
+                  been completed in the intended application(s)</label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="productDevelopmentAns"
+                    value="4"
+                    th:checked="*{productDevelopmentAns==4}"
+                  />
+                  Actual product/system has been proven to work in its
+                  near-final form under a representative set of expected
+                  conditions and environments
+                </label>
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="productDevelopmentAns"
+                    value="5"
+                    th:checked="*{productDevelopmentAns==5}"
+                  />
+                  Product/system is in final form and has been operated under
+                  the full range of operating conditions and environments
+                </label>
+              </div>
+            </div>
+
+            <hr class="my-3" />
+            <div class="ml-6 text-sm">
+              <div class="flex justify-start">
+                <h2 class="text-black mb-3 text-base">
+                  Competitive Landscape <span class="text-red-600"> *</span>
+                </h2>
+              </div>
+
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="competitiveLandscapeAns"
+                    value="1"
+                    th:checked="*{competitiveLandscapeAns==1}"
+                  />
+                  Secondary market research has been performed and basic
+                  knowledge of potential applications and competitive landscape
+                  have been identified</label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="competitiveLandscapeAns"
+                    value="2"
+                    th:checked="*{competitiveLandscapeAns==2}"
+                  />
+                  Primary market research to prove the product/system commercial
+                  feasibility has been completed and basic understanding of
+                  competitive products/systems has been demonstrated</label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="competitiveLandscapeAns"
+                    value="3"
+                    th:checked="*{competitiveLandscapeAns==3}"
+                  />
+                  Comprehensive market research to prove the product/system
+                  commercial feasibility has been completed and intermediate
+                  understanding of competitive products/systems has been
+                  demonstrated</label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="competitiveLandscapeAns"
+                    value="4"
+                    th:checked="*{competitiveLandscapeAns==4}"
+                  />
+                  Competitive analysis to illustrate unique features and
+                  advantages of the product/system compared to competitive
+                  products/systems has been completed
+                </label>
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="competitiveLandscapeAns"
+                    value="5"
+                    th:checked="*{competitiveLandscapeAns==5}"
+                  />
+                  Full and complete understanding of the competitive landscape,
+                  target application(s), competitive products/systems, and
+                  market has been achieved
+                </label>
+              </div>
+            </div>
+
+            <hr class="my-3" />
+            <div class="ml-6 text-sm">
+              <div class="flex justify-start">
+                <h2 class="text-black mb-3 text-base">
+                  Product Development/Design
+                  <span class="text-red-600"> *</span>
+                </h2>
+              </div>
+
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="productDesignAns"
+                    value="1"
+                    th:checked="*{productDesignAns==1}"
+                  />
+                  One or more initial product hypotheses have been
+                  defined</label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="productDesignAns"
+                    value="2"
+                    th:checked="*{productDesignAns==2}"
+                  />
+                  Mapping product/system attributes against customer needs has
+                  highlighted a clear value proposition</label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="productDesignAns"
+                    value="3"
+                    th:checked="*{productDesignAns==3}"
+                  />
+                  The product/system has been scaled from laboratory to pilot
+                  scale and issues that may affect achieving full scale have
+                  been identified</label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="productDesignAns"
+                    value="4"
+                    th:checked="*{productDesignAns==4}"
+                  />
+                  Comprehensive customer value proposition model has been
+                  developed, including a detailed understanding of
+                  product/system design specifications, required certifications,
+                  and trade-offs
+                </label>
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="productDesignAns"
+                    value="5"
+                    th:checked="*{productDesignAns==5}"
+                  />
+                  Product/system final design optimization has been completed,
+                  required certifications have been obtained, and product/system
+                  has incorporated detailed customer and product requirements
+                </label>
+              </div>
+            </div>
+
+            <hr class="my-3" />
+            <div class="ml-6 text-sm">
+              <div class="flex justify-start">
+                <h2 class="text-black mb-3 text-base">
+                  Team <span class="text-red-600"> *</span>
+                </h2>
+              </div>
+
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="teamAns"
+                    value="1"
+                    th:checked="*{teamAns==1}"
+                  />
+                  No team or company in place (single individual, no legal
+                  entity)</label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="teamAns"
+                    value="2"
+                    th:checked="*{teamAns==2}"
+                  />
+                  Solely technical or non-technical founder(s) running the
+                  company with no outside assistance</label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="teamAns"
+                    value="3"
+                    th:checked="*{teamAns==3}"
+                  />
+                  Solely technical or non-technical founder(s) running the
+                  company with assistance from outside advisors/mentors and/or
+                  incubator/accelerator</label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="teamAns"
+                    value="4"
+                    th:checked="*{teamAns==4}"
+                  />
+                  Balanced team with technical and business
+                  development/commercialization experience running the company
+                  with assistance from outside advisors/mentors
+                </label>
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="teamAns"
+                    value="5"
+                    th:checked="*{teamAns==5}"
+                  />
+                  Balanced team with all capabilities onboard (e.g., sales,
+                  marketing, customer service, operations, etc.) running the
+                  company with assistance from outside advisors/mentors
+                </label>
+              </div>
+            </div>
+
+            <hr class="my-3" />
+            <div class="ml-6 text-sm">
+              <div class="flex justify-start">
+                <h2 class="text-black mb-3 text-base">
+                  Go-to-Market <span class="text-red-600"> *</span>
+                </h2>
+              </div>
+
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="goToMarketAns"
+                    value="1"
+                    th:checked="*{goToMarketAns==1}"
+                  />
+                  Initial business model and value proposition have been
+                  defined</label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="goToMarketAns"
+                    value="2"
+                    th:checked="*{goToMarketAns==2}"
+                  />
+                  Customers/partners have been interviewed to understand their
+                  pain points/needs, and business model and value proposition
+                  have been refined based on customer/partner feedback</label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="goToMarketAns"
+                    value="3"
+                    th:checked="*{goToMarketAns==3}"
+                  />
+                  Market and customer/partner needs and how those translate to
+                  product requirements have been defined, and initial
+                  relationships have been developed with key stakeholders across
+                  the value chain</label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="goToMarketAns"
+                    value="4"
+                    th:checked="*{goToMarketAns==4}"
+                  />
+                  Partnerships have been formed with key stakeholders across the
+                  value chain (e.g., suppliers, partners, service providers, and
+                  customers)
+                </label>
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="goToMarketAns"
+                    value="5"
+                    th:checked="*{goToMarketAns==5}"
+                  />
+                  Supply agreements with suppliers and partners are in place and
+                  initial purchase orders from customers have been received
+                </label>
+              </div>
+            </div>
+
+            <hr class="my-3" />
+            <div class="ml-6 text-sm">
+              <div class="flex justify-start">
+                <h2 class="text-black mb-3 text-base">
+                  Manufacturing/Supply Chain
+                  <span class="text-red-600"> *</span>
+                </h2>
+              </div>
+
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="manufacturingAns"
+                    value="1"
+                    th:checked="*{manufacturingAns==1}"
+                  />
+                  Potential suppliers, partners, and customers have been
+                  identified and mapped in an initial value chain
+                  analysis</label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="manufacturingAns"
+                    value="2"
+                    th:checked="*{manufacturingAns==2}"
+                  />
+                  Relationships have been established with potential suppliers,
+                  partners, service providers, and customers and they have
+                  provided input on product and manufacturability
+                  requirements</label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="manufacturingAns"
+                    value="3"
+                    th:checked="*{manufacturingAns==3}"
+                  />
+                  Manufacturing process qualifications (e.g. QC/QA) have been
+                  defined and are in progress</label
+                >
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="manufacturingAns"
+                    value="4"
+                    th:checked="*{manufacturingAns==4}"
+                  />
+                  Products/systems have been pilot manufactured and sold to
+                  initial customerss
+                </label>
+              </div>
+              <div class="flex flex-row items-center mb-2">
+                <label class="cursor-pointer flex items-center text-left">
+                  <input
+                    oninput="this.className = ''"
+                    type="radio"
+                    name="manufacturingAns"
+                    value="5"
+                    th:checked="*{manufacturingAns==5}"
+                  />
+                  Full scale manufacturing and widespread deployment of
+                  product/system to customers and/or users has been achieved
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ------------------ -->
+        <div style="overflow: auto">
+          <div style="float: right">
+            <button
+              class="text-black hover:text-yellow-500 font-secondary font-medium right-0 rounded btn-neutral border-black border-solid border-opacity-100 mr-10"
+              type="button"
+              id="prevBtn"
+              onclick="nextPrev(-1)"
+            >
+              Previous
+            </button>
+            <button
+              class="bg-tanglow text-black hover:bg-black hover:text-white font-secondary font-medium right-0 rounded btn-neutral border-b-2 border-black border-solid border-opacity-100 w-36 h-12"
+              type="button"
+              id="nextBtn"
+              onclick="nextPrev(1)"
+            >
+              Next
+            </button>
+            <input
+              type="hidden"
+              name="button"
+              value="resubmit"
+              th:if="*{!bothFeedback}"
+            />
+            <input
+              type="hidden"
+              name="button"
+              value="submit"
+              th:if="*{bothFeedback}"
+            />
+            <input
+              type="hidden"
+              name="token"
+              th:value="${token}"
+              th:if="*{!bothFeedback}"
+            />
+            <input
+              type="hidden"
+              name="reApplyToken"
+              th:value="${token}"
+              th:if="*{bothFeedback}"
+            />
+            <input type="hidden" name="email" th:value="*{email}" />
+            <input type="hidden" name="agreeFlg" th:value="*{agreeFlg}" />
+            <input
+              type="hidden"
+              name="eligibilityAgreeFlg"
+              th:value="*{eligibilityAgreeFlg}"
+            />
+            <input
+              type="hidden"
+              name="commitmentOneFlg"
+              th:value="*{commitmentOneFlg}"
+            />
+            <input
+              type="hidden"
+              name="commitmentTwoFlg"
+              th:value="*{commitmentTwoFlg}"
+            />
+            <input
+              type="hidden"
+              name="commitmentThreeFlg"
+              th:value="*{commitmentThreeFlg}"
+            />
+            <input
+              type="hidden"
+              name="commitmentFourFlg"
+              th:value="*{commitmentFourFlg}"
+            />
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px">
+          <span class="step"></span>
+          <span class="step"></span>
+          <span class="step"></span>
+        </div>
+      </form>
+    </div>
+
+    <!-- RIGHT side -->
+    <div>
+      <!-- <input type="hidden" name="encryptedApplicantIdPk" /> -->
+
+      <div class="checklist w-[45%] text-sm pt-20">
+        <!-- <div class="flex justify-end"> -->
+        <!-- th:href="@{/manager/rank-startups}" -->
+        <!-- <a class="close-button">&times;</a> -->
+        <!-- <a href="/login" class="resubmit-back-button">Back to login</a> -->
+        <!-- </div> -->
+        <!-- prescreen -->
+        <!-- <h1 class="text-base">Feedbacks</h1> -->
+        <h1 class="font-semibold text-lg flex justify-start">
+          Feedback summary
+        </h1>
+        <!-- <h1 class="font-semibold text-lg">Feedback summary 1</h1> -->
+        <!-- <div>
+          <div
+            class="pt-3 flex flex-col w-full relative border-gray-200 bg-transparent focus-within:border-blue-600"
+          ></div>
+        </div> -->
+        <hr class="my-4" />
+
+        <!--  Documentary Requirements-->
+        <div>
+          <div class="w-full overflow-x-auto">
+            <!-- <div class="overflow-auto w-[700px] h-[550px]"> -->
+            <div class="min-w-[1000px]">
+              <h2 class="text-black flex justify-start">
+                I. Documentary Requirements
+              </h2>
+
+              <table class="w-full h-full">
+                <thead>
+                  <tr>
+                    <th
+                      class="w-1/5 font-semibold border border-gray-500 px-4 py-2 text-sm"
+                    >
+                      Category
+                    </th>
+                    <th
+                      class="w-1/4 font-semibold border border-gray-500 px-4 py-2 text-sm"
+                    >
+                      Guide Question
+                    </th>
+
+                    <th
+                      class="w-2/5 font-semibold border border-gray-500 px-4 py-2 text-sm"
+                    >
+                      Comment
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th
+                      class="font-normal border border-gray-500 px-4 py-2 text-sm"
+                    >
+                      LaunchLab Capsule Proposal
+                    </th>
+                    <td class="border border-gray-500 px-2 py-2">
+                      <p class="resize-none w-full sm:text-sm">
+                        Has the applicant provided a detailed LaunchLab capsule
+                        proposal including all required information?
+                      </p>
+                    </td>
+
+                    <td class="border border-gray-500 px-2 py-2">
+                      <textarea
+                        placeholder="Enter comment"
+                        readonly
+                        th:text="*{appOffFeedbackObj.ctOneComments != '' ? appOffFeedbackObj.ctOneComments : 'No comment'}"
+                        class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                      ></textarea>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th
+                      class="font-normal border border-gray-500 px-4 py-2 text-sm"
+                    >
+                      Work Plan/Gantt Chart
+                    </th>
+                    <td class="border border-gray-500 px-2 py-2">
+                      <p class="resize-none w-full sm:text-sm">
+                        Has the applicant created a detailed Work Plan or Gantt
+                        Chart for their project?
+                      </p>
+                    </td>
+
+                    <td class="border border-gray-500 px-2 py-2">
+                      <textarea
+                        placeholder="Enter comment"
+                        readonly
+                        th:text="*{appOffFeedbackObj.ctTwoComments != '' ? appOffFeedbackObj.ctTwoComments : 'No comment'}"
+                        class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                      ></textarea>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th
+                      class="font-normal border border-gray-500 px-4 py-2 text-sm"
+                    >
+                      Curriculum Vitae
+                    </th>
+                    <td class="border border-gray-500 px-2 py-2">
+                      <p class="resize-none w-full sm:text-sm">
+                        Is the Curriculum Vitae of the Project Leader complete
+                        and up-to-date?
+                      </p>
+                    </td>
+
+                    <td class="border border-gray-500 px-2 py-2">
+                      <textarea
+                        placeholder="Enter comment"
+                        readonly
+                         th:text="*{appOffFeedbackObj.ctThreeComments != '' ? appOffFeedbackObj.ctThreeComments : 'No comment'}"
+                        class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                      ></textarea>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th
+                      class="font-normal border border-gray-500 px-4 py-2 text-sm"
+                    >
+                      Proof of Concept Documentation
+                    </th>
+                    <td class="border border-gray-500 px-2 py-2">
+                      <p class="resize-none w-full sm:text-sm">
+                        Has the applicant provided documentation or evidence for
+                        their prototype or proof of concept?
+                      </p>
+                    </td>
+
+                    <td class="border border-gray-500 px-2 py-2">
+                      <textarea
+                        placeholder="Enter comment"
+                        th:text="*{appOffFeedbackObj.ctFourComments != '' ? appOffFeedbackObj.ctFourComments : 'No comment'}"
+                        readonly
+                        class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                      ></textarea>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <hr class="my-4" />
+
+        <!--  Pre-Screening Criteria-->
+        <div>
+          <div class="w-full overflow-x-auto">
+            <!-- <div class="overflow-auto w-[700px] h-[550px]"> -->
+            <div class="min-w-[1000px]">
+              <h2 class="text-black flex justify-start">
+                II. Pre-Screening Criteria
+              </h2>
+
+              <table class="w-full h-full">
+                <thead>
+                  <tr>
+                    <th
+                      class="w-1/5 font-semibold border border-gray-500 px-4 py-2 text-sm"
+                    >
+                      Category
+                    </th>
+                    <th
+                      class="w-1/4 font-semibold border border-gray-500 px-4 py-2 text-sm"
+                    >
+                      Guide Question
+                    </th>
+
+                    <th
+                      class="w-2/5 font-semibold border border-gray-500 px-4 py-2 text-sm"
+                    >
+                      Comment
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th
+                      class="font-normal border border-gray-500 px-4 py-2 text-sm"
+                    >
+                      Alignment with Theme
+                    </th>
+                    <td class="border border-gray-500 px-2 py-2">
+                      <p class="resize-none w-full sm:text-sm">
+                        Does the startup's proposal align with the current cycle
+                        themes or priority areas of DASIG partners?
+                      </p>
+                    </td>
+
+                    <td class="border border-gray-500 px-2 py-2">
+                      <textarea
+                        placeholder="Enter comment"
+                        readonly
+                        th:text="*{appOffFeedbackObj.ctFiveComments != '' ? appOffFeedbackObj.ctFiveComments : 'No comment'}"
+                        class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                      ></textarea>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th
+                      class="font-normal border border-gray-500 px-4 py-2 text-sm"
+                    >
+                      Project Uniqueness
+                    </th>
+                    <td class="border border-gray-500 px-2 py-2">
+                      <p class="resize-none w-full sm:text-sm">
+                        Is the project unique and not a duplication of ongoing
+                        projects under DASIG?
+                      </p>
+                    </td>
+
+                    <td class="border border-gray-500 px-2 py-2">
+                      <textarea
+                        placeholder="Enter comment"
+                        th:text="*{appOffFeedbackObj.ctSixComments != '' ? appOffFeedbackObj.ctSixComments : 'No comment'}"
+                        readonly
+                        class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                      ></textarea>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th
+                      class="font-normal border border-gray-500 px-4 py-2 text-sm"
+                    >
+                      Prototype/Proof of Concept
+                    </th>
+                    <td class="border border-gray-500 px-2 py-2">
+                      <p class="resize-none w-full sm:text-sm">
+                        Does the applicant have an early-stage prototype or
+                        proof of concept for their product/service?
+                      </p>
+                    </td>
+
+                    <td class="border border-gray-500 px-2 py-2">
+                      <textarea
+                        placeholder="Enter comment"
+                        th:text="*{appOffFeedbackObj.ctSevenComments != '' ? appOffFeedbackObj.ctSevenComments : 'No comment'}"
+                        readonly
+                        class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                      ></textarea>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th
+                      class="font-normal border border-gray-500 px-4 py-2 text-sm"
+                    >
+                      Residency and Affiliation
+                    </th>
+                    <td class="border border-gray-500 px-2 py-2">
+                      <p class="resize-none w-full sm:text-sm">
+                        Is the project leader or founder a resident of Central
+                        Visayas or affiliated with regional institutions?
+                      </p>
+                    </td>
+
+                    <td class="border border-gray-500 px-2 py-2">
+                      <textarea
+                        placeholder="Enter comment"
+                        readonly
+                        th:text="*{appOffFeedbackObj.ctEightComments != '' ? appOffFeedbackObj.ctEightComments : 'No comment'}"
+                        class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                      ></textarea>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th
+                      class="font-normal border border-gray-500 px-4 py-2 text-sm"
+                    >
+                      Intellectual Property Rights
+                    </th>
+                    <td class="border border-gray-500 px-2 py-2">
+                      <p class="resize-none w-full sm:text-sm">
+                        Are there any intellectual property conflicts with the
+                        presented technology or solution?
+                      </p>
+                    </td>
+
+                    <td class="border border-gray-500 px-2 py-2">
+                      <textarea
+                        placeholder="Enter comment"
+                        readonly
+                        th:text="*{appOffFeedbackObj.ctNineComments != '' ? appOffFeedbackObj.ctNineComments : 'No comment'}"
+                        class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                      ></textarea>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <hr class="my-4" />
+        <div class="w-full h-[100px]">
+          <textarea
+            name="recommendation"
+            placeholder="Recommendations ni officer"
+            readonly
+            th:text="*{appOffFeedbackObj.recommendation}"
+            class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+          ></textarea>
+        </div>
+        <hr class="my-4" />
+
+        <!-- evaluation  -->
+        <h1 class="font-semibold text-lg" th:if="*{bothFeedback}">
+          Feedback Summary 2
+        </h1>
+        <div th:if="*{bothFeedback}">
+          <div
+            class="pt-3 flex flex-col w-full relative border-gray-200 bg-transparent focus-within:border-blue-600"
+          ></div>
+        </div>
+        <hr class="my-4" th:if="*{bothFeedback}" />
+
+        <div>
+          <div
+            class="w-full overflow-x-auto max-h-[550px]"
+            th:if="*{bothFeedback}"
+          >
+            <div class="min-w-[1000px]">
+              <div>
+                <table class="w-full h-full">
+                  <thead>
+                    <tr>
+                      <th
+                        class="w-1/5 font-semibold border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Criteria
+                      </th>
+                      <th
+                        class="w-1/4 font-semibold border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Guide Question
+                      </th>
+                      <th
+                        class="font-semibold border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Rating (1-10)
+                      </th>
+                      <th
+                        class="w-2/5 font-semibold border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Comment
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th
+                        colspan="4"
+                        class="text-left font-normal border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Technical Viability (10%)
+                      </th>
+                    </tr>
+
+                    <tr class="h-[150px]">
+                      <th
+                        class="font-normal border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Maturity for Implementation
+                      </th>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <!-- oninput="this.className = ''" -->
+                        <p class="resize-none w-full sm:text-sm">
+                          To what extent do you agree that the technology is
+                          mature and ready for acceleration?
+                        </p>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <div
+                          class="text-sm font-20"
+                          th:text="*{applicantTbiFeedbackObj.ctOneRating}"
+                        ></div>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <textarea
+                          oninput="this.className = 'w-full h-32 max-h-32 px-2 py-1 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'"
+                          placeholder="Enter comment"
+                          th:text="*{applicantTbiFeedbackObj.ctOneComments}"
+                          readonly
+                          class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th
+                        colspan="4"
+                        class="text-left font-normal border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Social and Environmental Impact (10%)
+                      </th>
+                    </tr>
+                    <tr class="h-[150px]">
+                      <th
+                        class="font-normal border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Environmental and Health Safety
+                      </th>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <p class="resize-none w-full sm:text-sm">
+                          How strongly do you agree that the technology poses no
+                          immediate or long-term hazards to the environment,
+                          health, or safety?
+                        </p>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <div
+                          class="text-sm font-20"
+                          th:text="*{applicantTbiFeedbackObj.ctTwoRating}"
+                        ></div>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <textarea
+                          oninput="this.className = 'w-full h-32 max-h-32 px-2 py-1 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'"
+                          placeholder="Enter comment"
+                          th:text="*{applicantTbiFeedbackObj.ctTwoComments}"
+                          readonly
+                          class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th
+                        colspan="4"
+                        class="text-left font-normal border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Commercial Viability (20%)
+                      </th>
+                    </tr>
+                    <tr class="h-[150px]">
+                      <th
+                        class="font-normal border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Market Competitiveness
+                      </th>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <p class="resize-none w-full sm:text-sm">
+                          To what extent do you agree that the technology is
+                          competitive over existing market products or
+                          processes?
+                        </p>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <div
+                          class="text-sm font-20"
+                          th:text="*{applicantTbiFeedbackObj.ctThreeRating}"
+                        ></div>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <textarea
+                          oninput="this.className = 'w-full h-32 max-h-32 px-2 py-1 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'"
+                          placeholder="Enter comment"
+                          th:text="*{applicantTbiFeedbackObj.ctThreeComments}"
+                          readonly
+                          class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                    </tr>
+                    <tr class="h-[150px]">
+                      <th
+                        class="font-normal border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Market Potential
+                      </th>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <p class="resize-none w-full sm:text-sm">
+                          How strongly do you agree that the technology has a
+                          strong market potential?
+                        </p>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <div
+                          class="text-sm font-20"
+                          th:text="*{applicantTbiFeedbackObj.ctFourRating}"
+                        ></div>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <textarea
+                          oninput="this.className = 'w-full h-32 max-h-32 px-2 py-1 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'"
+                          placeholder="Enter comment"
+                          th:text="*{applicantTbiFeedbackObj.ctFourComments}"
+                          readonly
+                          class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th
+                        colspan="4"
+                        class="text-left font-normal border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Scalability (30%)
+                      </th>
+                    </tr>
+                    <tr class="h-[150px]">
+                      <th
+                        class="font-normal border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Potential for Scale-up
+                      </th>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <p class="resize-none w-full sm:text-sm">
+                          To what extent do you agree that the technology can be
+                          scaled up efficiently and effectively to meet growing
+                          demand?
+                        </p>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <div
+                          class="text-sm font-20"
+                          th:text="*{applicantTbiFeedbackObj.ctFiveRating}"
+                        ></div>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <textarea
+                          oninput="this.className = 'w-full h-32 max-h-32 px-2 py-1 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'"
+                          placeholder="Enter comment"
+                          th:text="*{applicantTbiFeedbackObj.ctFiveComments}"
+                          readonly
+                          class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th
+                        colspan="4"
+                        class="text-left font-normal border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Management Capability (15%)
+                      </th>
+                    </tr>
+                    <tr class="h-[150px]">
+                      <th
+                        class="font-normal border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Leadership Competence
+                      </th>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <p class="resize-none w-full sm:text-sm">
+                          How strongly do you agree that the project leader
+                          demonstrates necessary technical and managerial
+                          competence?
+                        </p>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <div
+                          class="text-sm font-20"
+                          th:text="*{applicantTbiFeedbackObj.ctSixRating}"
+                        ></div>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <textarea
+                          oninput="this.className = 'w-full h-32 max-h-32 px-2 py-1 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'"
+                          placeholder="Enter comment"
+                          th:text="*{applicantTbiFeedbackObj.ctSixComments}"
+                          readonly
+                          class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                    </tr>
+                    <tr class="h-[150px]">
+                      <th
+                        class="font-normal border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Workforce and Facilities
+                      </th>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <p class="resize-none w-full sm:text-sm">
+                          To what extent do you agree that there is a competent
+                          and reliable workforce and facilities available for
+                          the project?
+                        </p>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <div
+                          class="text-sm font-20"
+                          th:text="*{applicantTbiFeedbackObj.ctSevenRating}"
+                        ></div>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <textarea
+                          oninput="this.className = 'w-full h-32 max-h-32 px-2 py-1 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'"
+                          placeholder="Enter comment"
+                          th:text="*{applicantTbiFeedbackObj.ctSevenComments}"
+                          readonly
+                          class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                    </tr>
+                    <tr class="h-[150px]">
+                      <th
+                        class="font-normal border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Realistic Project Timeline (15%)
+                      </th>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <p class="resize-none w-full sm:text-sm">
+                          How strongly do you agree that the project timeline is
+                          manageable and realistic?
+                        </p>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <div
+                          class="text-sm font-20"
+                          th:text="*{applicantTbiFeedbackObj.ctEightRating}"
+                        ></div>
+                      </td>
+                      <td class="border border-gray-500 px-2 py-2">
+                        <textarea
+                          oninput="this.className = 'w-full h-32 max-h-32 px-2 py-1 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'"
+                          placeholder="Enter comment"
+                          th:text="*{applicantTbiFeedbackObj.ctEightComments != '' ? applicantTbiFeedbackObj.ctEightComments : 'No Comment'}"
+                          readonly
+                          class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+                        ></textarea>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th
+                        colspan="2"
+                        class="h-[100px] font-normal border border-gray-500 px-4 py-2 text-sm"
+                      >
+                        Total
+                      </th>
+
+                      <td class="border border-gray-500 px-2 py-2">
+                        <div class="text-sm flex justify-center">
+                          compute score here
+                        </div>
+                      </td>
+                      <td
+                        class="border border-gray-500 px-2 py-2 total-score"
+                      ></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr class="my-4" th:if="*{bothFeedback}" />
+
+        <!-- additional feedback -->
+        <div class="flex flex-col" th:if="*{bothFeedback}">
+          <div class="w-full h-[100px]">
+            <textarea
+              oninput="this.className = 'resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm'"
+              placeholder="Additional feedback ni tbiboard"
+              th:text="*{applicantTbiFeedbackObj.tbiFeedback}"
+              readonly
+              class="resize-none w-full h-full border border-slate-300 rounded-md py-2 pl-3 shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600 focus:ring-1 sm:text-sm"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      var currentTab = 0;
+      showTab(currentTab);
+
+      function showTab(n) {
+        var x = document.getElementsByClassName("tab");
+        // Hide all tabs
+        for (var i = 0; i < x.length; i++) {
+          x[i].style.display = "none";
+        }
+        // Show the current tab
+        x[n].style.display = "block";
+
+        // Always show the Previous button except on the first page
+        document.getElementById("prevBtn").style.display =
+          n === 0 ? "none" : "inline";
+
+        // Change Next to Submit on the last page
+        document.getElementById("nextBtn").innerHTML =
+          n === x.length - 1 ? "Submit" : "Next";
+
+        fixStepIndicator(n);
+
+        // Scroll to the top of the page
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function nextPrev(n) {
+        var x = document.getElementsByClassName("tab");
+
+        // Check if it's the submit button on the last tab
+        if (currentTab === x.length - 1 && n === 1) {
+          // Submit the form
+          document.getElementById("regForm").submit();
+          return;
+        }
+
+        // Hide current tab
+        x[currentTab].style.display = "none";
+
+        // Update currentTab
+        currentTab += n;
+
+        // Ensure we stay within bounds
+        if (currentTab >= x.length) {
+          currentTab = x.length - 1;
+        } else if (currentTab < 0) {
+          currentTab = 0;
+        }
+
+        // Show the new tab
+        showTab(currentTab);
+      }
+
+      function fixStepIndicator(n) {
+        var i,
+          x = document.getElementsByClassName("step");
+        for (i = 0; i < x.length; i++) {
+          x[i].className = x[i].className.replace(" active", "");
+        }
+        x[n].className += " active";
+      }
+
+      // Remove event listeners that were checking agreements
+      document.addEventListener("DOMContentLoaded", function () {
+        // No need to call checkAgreement() or other validation functions
+      });
+    </script>
+    <script th:inline="javascript">
+      console.log(/*[[${applicantWebDto}]]*/ "");
+    </script>
+  </body>
+</html>

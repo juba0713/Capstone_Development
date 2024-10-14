@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Insert title here</title>
+    <link rel="stylesheet" th:href="@{/css/output.css}" />
+    <style>
+      .message-success {
+        position: absolute;
+        top: 160px;
+        left: 0;
+        width: 100%;
+        background: transparent;
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+      }
+
+      .message-success div {
+        background: #fff;
+        padding: 20px;
+        border-radius: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="message-success" th:if="${success != null}" id="flash-message">
+      <div th:text="${success}"></div>
+    </div>
+    <!-- <div class="bg-green-500 h-screen"> -->
+    <div>
+      <div>
+        <!-- class="border-2 border-yellow-300 h-screen w-screen md:bg-center md:bg-cover md:bg-local absolute md:h-560 md:min-w-full" -->
+        <div>
+          <img
+            th:src="@{/images/darkenlandingpageImg.png}"
+            class="pointer-events-none absolute bg-no-repeat bg-center bg-local inset-0 w-full h-full object-cover"
+          />
+          <div
+            class="curved-background h-64 z-10 absolute bottom-0 w-full"
+          ></div>
+        </div>
+        <div
+          class="z-50 relative flex justify-center items-center md:flex flex-wrap md:justify-between h-24"
+        >
+          <div>
+            <img
+              class="pointer-events-none h-20 p-3 md:ml-20"
+              th:src="@{/images/yellowLogo.png}"
+            />
+          </div>
+          <a th:href="@{/applicant/form}" class="w-full md:w-1/5">
+            <div
+              class="font-primary tracking-widest cursor-pointer text-center h-14 md:mr-20 content-center buttonfx slideleft"
+            >
+              <p>APPLY AS APPLICANT</p>
+            </div>
+          </a>
+        </div>
+        <div
+          class="pointer-events-none z-10 relative text-center p-8 md:p-28 font-primary md:text-5xl text-3xl mt-10"
+        >
+          <span class="text-white">LOGIN</span>
+          <span class="text-[#FDCC01]">AS</span>
+        </div>
+
+        <div
+          class="md:bottom-24 text-lg z-10 absolute w-full justify-center flex flex-wrap flex-row text-center md:gap-10 font-secondary font-semibold text-50 text-black md:mt-20"
+        >
+          <a th:href="@{/login/applicant}" class="role-btn" name="applicant">
+            <div
+              class="flex justify-center card md:rounded-radius-40 flex-col w-screen min-h-32 min-w-60 md:h-300 md:w-72 image-full items-center bg-[#EAEAEA] md:hover:bg-tanglow hover:shadow-xl duration-100 ease-in cursor-pointer border-b-10 border-transparent transform hover:border-black hover:border-b-10"
+            >
+              <p>APPLICANT</p>
+            </div>
+          </a>
+          <a th:href="@{/login/officer}" class="role-btn" name="officer">
+            <div
+              class="flex justify-center card md:rounded-radius-40 flex-col w-screen min-h-32 min-w-60 md:h-300 md:w-72 image-full items-center bg-[#EAEAEA] md:hover:bg-tanglow hover:shadow-xl duration-100 ease-in cursor-pointer border-b-10 border-transparent transform hover:border-black hover:border-b-10"
+            >
+              <p>OFFICER</p>
+            </div>
+          </a>
+
+          <a th:href="@{/login/tbi-board}" class="role-btn" name="tbiboard">
+            <div
+              class="flex justify-center card md:rounded-radius-40 flex-col w-screen min-h-32 min-w-60 md:h-300 md:w-72 image-full items-center bg-[#EAEAEA] md:hover:bg-tanglow hover:shadow-xl duration-100 ease-in cursor-pointer border-b-10 border-transparent transform hover:border-black hover:border-b-10"
+            >
+              <p>TBI BOARD</p>
+            </div>
+          </a>
+          <a th:href="@{/login/manager}" class="role-btn" name="manager">
+            <div
+              class="flex justify-center card md:rounded-radius-40 flex-col w-screen min-h-32 min-w-60 md:h-300 md:w-72 image-full items-center bg-[#EAEAEA] md:hover:bg-tanglow hover:shadow-xl duration-100 ease-in cursor-pointer border-b-10 border-transparent transform hover:border-black hover:border-b-10"
+            >
+              <p>MANAGER</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+    <script>
+      // JavaScript function to remove the flash message after a specified time
+      function hideFlashMessage() {
+        const flashMessage = document.getElementById("flash-message");
+        if (flashMessage) {
+          setTimeout(() => {
+            flashMessage.style.display = "none";
+          }, 5000); // 5000 milliseconds = 5 seconds
+        }
+      }
+
+      // Call the function on page load
+      window.onload = hideFlashMessage;
+    </script>
+  </body>
+</html>

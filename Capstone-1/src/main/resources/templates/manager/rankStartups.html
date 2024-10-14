@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Rank Startups</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/2.0.5/css/dataTables.dataTables.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/output.css}" />
+
+    <style>
+      .dt-search {
+        font-family: Poppins;
+        width: 60%;
+        margin-left: auto;
+      }
+      .dt-end {
+        font-size: smaller;
+        position: relative;
+      }
+      .dt-input {
+        margin-right: 10px;
+      }
+      .modal-dialog {
+        max-width: 80%;
+      }
+      .modal-content {
+        width: 100%;
+        height: 92vh;
+      }
+      .feedback-modal-dialog {
+        max-width: 30%;
+        text-align: center;
+        max-height: 50px;
+      }
+      .feedback-modal-content {
+        height: 30%;
+      }
+
+      .ranking-container {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+      }
+
+      .ranking-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+      }
+
+      .ranking-item {
+        padding: 10px 15px;
+        margin-bottom: 10px;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+        transition: box-shadow 0.3s ease;
+      }
+
+      .ranking-item:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        background-color: #e9e9e9;
+      }
+
+      .ranking-item:last-child {
+        margin-bottom: 0;
+      }
+    </style>
+  </head>
+  <body th:object="${managerWebDto}">
+    <div>
+      <div
+        class="h-full flex flex-col w-[250px] absolute bg-black z-20 justify-between text-customyellow"
+      >
+        <div class="pt-4">
+          <img
+            class="filter-logo pointer-events-none h-16 w-52 flex justify-center mx-auto border-2 border-blue-500 mb-4"
+            th:src="@{/images/yellowLogo.png}"
+          />
+          <div
+            class="gap-4 flex flex-col font-secondary font-normal p-2 text-center"
+          >
+            <a
+              th:href="@{/manager/home}"
+              class="hover:rounded-sm hover:bg-tanglow hover:text-black hover:no-underline p-2"
+              >Home</a
+            >
+            <a
+              th:href="@{/manager/accepted-result}"
+              class="hover:rounded-sm hover:bg-tanglow hover:text-black hover:no-underline p-2"
+              >Accepted Applications</a
+            >
+            <a
+              th:href="@{/manager/evaluated-result}"
+              class="hover:rounded-sm hover:bg-tanglow hover:text-black hover:no-underline p-2"
+              >Evaluated Applications</a
+            >
+            <a
+              th:href="@{/manager/analytics}"
+              class="hover:rounded-sm hover:bg-tanglow hover:text-black hover:no-underline p-2"
+              >Analytics</a
+            >
+            <a
+              th:href="@{/manager/rank-startups}"
+              class="hover:rounded-sm hover:bg-tanglow hover:text-black hover:no-underline p-2"
+              >Rank Startups</a
+            >
+          </div>
+        </div>
+        <div
+          class="text-center p-2 text-xl font-primary hover:text-white w-full"
+        >
+          <form th:action="@{/logout}" method="POST">
+            <button
+              class="hover:text-black hover:bg-customyellow w-full p-2 rounded-sm"
+            >
+              Logout
+            </button>
+          </form>
+        </div>
+      </div>
+      <!-- applicant details -->
+      <div class="h-screen bg-[#F9F9F9] overflow-y-auto">
+        <div
+          class="flex place-items-end flex-col ml-60 pr-10 pt-3 sticky top-0 z-10 bg-opacity-5 backdrop-blur-[3px]"
+        >
+          <div class="font-primary text-4xl">
+            Welcome, <span th:text="${session.fullname}"></span>!
+          </div>
+          <div>ID: <span th:text="${session.id}"></span></div>
+        </div>
+        <div class="flex ml-[275px] mr-10 justify-between">
+          <div
+            class="mb-8 w-[55%] rounded-lg mt-8 bg-white border-2 sm:overflow-x-auto overflow-hidden p-10"
+          >
+            <table id="applicants-table" class="w-screen h-4/5">
+              <thead class="font-secondary text-sm bg-customyellow">
+                <tr>
+                  <th class="text-center rounded-top-left">Applicants</th>
+
+                  <th class="text-center rounded-top-right"></th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-grey-500 bodyrowhover">
+                <tr th:each="applicant : *{applicantMonthlyObj}">
+                  <td
+                    class="whitespace-nowrap max-w-0 truncate"
+                    th:text="${applicant.projectTitle}"
+                  ></td>
+
+                  <td>
+                    <form
+                      th:action="@{/manager/rank-startups/evaluate}"
+                      method="GET"
+                      target="_blank"
+                    >
+                      <input
+                        type="hidden"
+                        name="id"
+                        th:value="${applicant.encryptedApplicantIdPk}"
+                      />
+                      <button
+                        class="btn-row border-black hover:bg-[#FEE902] bg-black rounded-lg w-full hover:text-black text-gray-50 font-secondary sm:text-sm text-xs sm:p-1"
+                        type="submit"
+                      >
+                        Rank Startup
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="w-[40%] mt-8">
+            <div class="ranking-container">
+              <div class="flex justify-between">
+                <p class="font-bold text-xl mb-4">RANKING</p>
+                <p>download as pdf</p>
+              </div>
+              <ul class="ranking-list">
+                <li th:each="app : *{applicantRankingMonthlyObj}" class="ranking-item" th:text="${app.projectTitle}"></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- applicant details -->
+      <div class="modal" tabindex="-1" role="dialog" id="details-modal">
+        <div class="modal-dialog" role="document">
+          <div
+            th:replace="~{fragments/applicantdetails :: applicantDetailsFragment}"
+            class="modal-content"
+          ></div>
+        </div>
+      </div>
+      <!-- feedback modal result-->
+      <div class="modal" tabindex="-1" role="dialog" id="feedback-modal">
+        <div class="modal-dialog feedback-modal-dialog" role="document">
+          <div class="modal-content feedback-modal-content">
+            <div class="p-2">
+              <div class="rejected">
+                <div class="resubmitFlg"></div>
+                <div class="rejected-feedback"></div>
+              </div>
+              <div class="evaluated">
+                <div
+                  class="rounded-sm w-full text-center font-bold p-2 bg-customyellow"
+                >
+                  Feedback
+                </div>
+                <div class="text-left">
+                  <p class="score mb-2"></p>
+                  <p class="evaluated-feedback"></p>
+                  <!-- <hr class="my-4" /> -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.datatables.net/2.0.5/js/dataTables.js"></script>
+    <script th:inline="javascript">
+      const webDto = /*[[${managerWebDto}]]*/ "";
+      console.log(webDto);
+      $(document).ready(function () {
+        $("#applicants-table").dataTable({
+          columnDefs: [
+            {
+              // targets: "no-sort",
+              targets: [-1, -2],
+              orderable: false,
+            },
+          ],
+          searching: true,
+          // ordering: false,
+          info: true,
+          lengthChange: false,
+        });
+
+        //   let btnRows = document.getElementsByClassName("btn-row");
+
+        //   var rowBtnClicked = false;
+
+        //   for (let btn of btnRows) {
+        //     btn.addEventListener("click", function () {
+        //       rowBtnClicked = true;
+        //       let idPk = this.getAttribute("data-id");
+        //       if (this.name === "feedback") {
+        //         let evaluated = document.querySelector(".evaluated");
+        //         let rejected = document.querySelector(".rejected");
+
+        //         webDto.listOfApplicants.forEach((applicant) => {
+        //           if (applicant.applicantIdPk == idPk) {
+        //             evaluated.style.display = "inline";
+        //             rejected.style.display = "none";
+        //             let score = document.querySelector(".score");
+        //             let feedback = document.querySelector(".evaluated-feedback");
+
+        //             if (applicant.status == 5) {
+        //               score.innerHTML =
+        //                 "<p style='font-weight: 600; '>Score: </p>" +
+        //                 applicant.score;
+        //             } else {
+        //               score.innerHTML = "";
+        //             }
+
+        //             feedback.innerHTML =
+        //               "<p style='font-weight: 600; '>Feedback: </p>" +
+        //               applicant.feedback;
+        //           }
+        //         });
+
+        //         $("#feedback-modal").modal("show");
+        //       }
+        //       setTimeout(() => {
+        //         rowBtnClicked = false;
+        //       }, 100);
+        //     });
+        //   }
+        //
+      });
+    </script>
+    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+      integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script>
+      // Wait for the DOM to load before accessing elements
+      document.addEventListener("DOMContentLoaded", () => {
+        const downloadButton = document.querySelector(".download-btn");
+        console.log(downloadButton);
+        downloadButton.addEventListener("click", function () {
+          const { jsPDF } = window.jspdf;
+          const firstPageContent =
+            document.getElementById("first-page-content");
+          const secondPageContent = document.getElementById(
+            "second-page-content"
+          );
+          const thirdPageContent =
+            document.getElementById("third-page-content");
+          const forthPageContent =
+            document.getElementById("forth-page-content");
+          const fifthPageContent =
+            document.getElementById("fifth-page-content");
+          // const secondPageContentOne = document.getElementById(
+          //   "second-page-content-one"
+          // );
+          // const secondPageContentTwo = document.getElementById(
+          //   "second-page-content-two"
+          // );
+
+          //Logo for all page
+          // const image = document.createElement("img");
+          // image.src = "/images/wilBlackBox.png";
+          // image.alt = "image";
+          // image.style.position = "absolute";
+          // image.style.top = "10px";
+          // image.style.right = "10px";
+
+          //This is for first page content
+          let firstPageContentClone = firstPageContent.cloneNode(true);
+          let secondPageContentClone = secondPageContent.cloneNode(true);
+          let thirdPageContentClone = thirdPageContent.cloneNode(true);
+          let forthPageContentClone = forthPageContent.cloneNode(true);
+          let fifthPageContentClone = fifthPageContent.cloneNode(true);
+          // firstPageContentClone.style.position = "relative";
+
+          // firstPageContentClone.appendChild(image);
+
+          //This is for second page content
+          // let secondPageContentOneClone = secondPageContentOne.cloneNode(true);
+          // let secondPageContentTwoClone = secondPageContentTwo.cloneNode(true);
+
+          firstPageContentClone.style.height = "9999px";
+          firstPageContentClone.style.padding = "50px";
+
+          secondPageContentClone.style.height = "9999px";
+          secondPageContentClone.style.padding = "50px";
+
+          thirdPageContentClone.style.height = "9999px";
+          thirdPageContentClone.style.padding = "50px";
+
+          forthPageContentClone.style.height = "9999px";
+          forthPageContentClone.style.padding = "50px";
+
+          fifthPageContentClone.style.height = "9999px";
+          fifthPageContentClone.style.padding = "50px";
+          // secondPageContentTwoClone.style.padding = "0px 20px";
+          // secondPageContentTwoClone.style.fontSize = "50px";
+
+          // let problemStatement =
+          //   secondPageContentTwoClone.querySelector(".problemStatement");
+          // problemStatement.style.fontSize = "50px";
+          // problemStatement.style.border = "none !important";
+          // problemStatement.style.outline = "none !important";
+
+          // const secondPageContentClone = document.createElement("div");
+          // secondPageContentClone.style.position = "relative";
+
+          // secondPageContentClone.appendChild(image);
+          // secondPageContentClone.appendChild(secondPageContentOneClone);
+          // secondPageContentClone.appendChild(secondPageContentTwoClone);
+
+          //This is for third page content
+
+          document.body.appendChild(firstPageContentClone);
+          document.body.appendChild(secondPageContentClone);
+          document.body.appendChild(thirdPageContentClone);
+          document.body.appendChild(forthPageContentClone);
+          document.body.appendChild(fifthPageContentClone);
+          // document.body.appendChild(secondPageContentClone);
+
+          const doc = new jsPDF("p", "pt", "a4"); // 'l' for landscape, 'pt' for points (unit), 'a4' for A4 size
+
+          html2canvas(firstPageContentClone).then((canvas) => {
+            const imgData = canvas.toDataURL("image/png");
+
+            const imgProps = doc.getImageProperties(imgData);
+            const pdfWidth = doc.internal.pageSize.getWidth();
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            doc.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+            // Add a new page before adding the second page content
+            doc.addPage();
+
+            html2canvas(secondPageContentClone).then((canvas) => {
+              const imgData = canvas.toDataURL("image/png");
+              const imgProps = doc.getImageProperties(imgData);
+              const pdfWidth = doc.internal.pageSize.getWidth();
+              const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+              doc.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+              doc.addPage();
+
+              html2canvas(thirdPageContentClone).then((canvas) => {
+                const imgData = canvas.toDataURL("image/png");
+                const imgProps = doc.getImageProperties(imgData);
+                const pdfWidth = doc.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                doc.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+                doc.addPage();
+
+                html2canvas(forthPageContentClone).then((canvas) => {
+                  const imgData = canvas.toDataURL("image/png");
+                  const imgProps = doc.getImageProperties(imgData);
+                  const pdfWidth = doc.internal.pageSize.getWidth();
+                  const pdfHeight =
+                    (imgProps.height * pdfWidth) / imgProps.width;
+                  doc.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+                  doc.addPage();
+
+                  html2canvas(fifthPageContentClone).then((canvas) => {
+                    const imgData = canvas.toDataURL("image/png");
+                    const imgProps = doc.getImageProperties(imgData);
+                    const pdfWidth = doc.internal.pageSize.getWidth();
+                    const pdfHeight =
+                      (imgProps.height * pdfWidth) / imgProps.width;
+                    doc.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+                    // Save the PDF after the second page is added
+                    doc.save("applicant_Form_Data.pdf");
+
+                    firstPageContentClone.remove();
+                    secondPageContentClone.remove();
+                    thirdPageContentClone.remove();
+                    forthPageContentClone.remove();
+                    fifthPageContentClone.remove();
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

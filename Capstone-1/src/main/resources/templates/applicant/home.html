@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Application</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" th:href="@{/css/output.css}" />
+    <style>
+      /* Style the Image Used to Trigger the Modal */
+      img {
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      img:hover {
+        opacity: 0.7;
+      }
+
+      /* The Modal (background) */
+      #image-viewer {
+        display: none;
+        position: fixed;
+        z-index: 999999;
+        padding-top: 100px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0, 0, 0);
+        background-color: rgba(0, 0, 0, 0.9);
+      }
+      .modal-content {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+      }
+      /* .modal-content {
+        animation-name: zoom;
+        animation-duration: 0.6s;
+      } */
+      /* @keyframes zoom {
+        from {
+          transform: scale(0);
+        }
+        to {
+          transform: scale(1);
+        }
+      } */
+      #image-viewer .close {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #f1f1f1;
+        /* font-size: 40px; */
+        /* font-weight: bold; */
+        transition: 0.3s;
+      }
+      #image-viewer .close:hover,
+      #image-viewer .close:focus {
+        color: #bbb;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      @media only screen and (max-width: 700px) {
+        .modal-content {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="image-viewer">
+      <span class="close">&times;</span>
+      <img class="modal-content" id="full-image" />
+    </div>
+    <div
+      class="px-12 pt-4 h-screen bg-[#F9F9F9] flex flex-col"
+      th:object="${applicantWebDto}"
+    >
+      <div sec:authorize="isAuthenticated()">
+        <div
+          class="h-20 flex flex-row justify-between bg-gradient-to-r from-[#E7BA05] to-customyellow rounded-tr-3xl rounded-tl-3xl"
+        >
+          <div
+            class="flex text-center items-center p-4 text-3xl font-secondary font-semibold"
+          >
+            APPLICANT DASHBOARD
+          </div>
+          <div class="p-2 mr-4">
+            <div class="font-primary text-3xl">
+              Welcome, <span th:text="${session.fullname}"></span>!
+            </div>
+            <div class="flex justify-end">
+              ID: <span th:text="${session.id}"></span>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-row pt-4">
+          <div class="w-44">
+            <div class="font-primary text-[22px] pl-2">Application Status:</div>
+
+            <div th:if="*{applicantDetailsObj.status >= 5}">
+              <div
+                class="z-50 rounded-xl w-full text-center"
+                th:text="*{applicantDetailsObj.totalRating} >= 60 ? 'Passed' : 'Rejected'"
+                th:style="*{applicantDetailsObj.totalRating} >= 60 ? 'background: green;' : 'background: red;'"
+              >
+                Rejected
+                <!--  pending
+                  accepted
+                  rejected : display feedback btn
+                  in office
+                  in tbi board
+                  completed
+            -->
+              </div>
+              <button
+                class="z-50 rounded-lg hover:text-white hover:cursor-pointer border-black hover:bg-black border p-2 mt-1 w-full font-secondary text-xs"
+                data-toggle="modal"
+                data-target="#feedback-modal"
+              >
+                View Feedback
+              </button>
+
+              <!-- feedback modal result -->
+              <div
+                class="modal"
+                tabindex="-1"
+                role="dialog"
+                id="feedback-modal"
+              >
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content p-2">
+                    <div class="font-secondary">
+                      <div
+                        class="w-full text-center font-bold rounded-sm p-2"
+                        th:text="*{applicantDetailsObj.totalRating} >= 60 ? 'Passed' : 'Rejected'"
+                        th:style="*{applicantDetailsObj.totalRating} >= 60 ? 'background: green; color: white; font-weight: normal' : 'background: red; color: white; font-weight: normal'"
+                      >
+                        <!--  pending
+                  accepted
+                  rejected : display feedback btn
+                  in office
+                  in tbi board
+                  completed
+            -->
+                      </div>
+                      <p class="font-semibold">Score:</p>
+                      <div th:text="*{applicantDetailsObj.totalRating}"></div>
+                      <p class="font-semibold">Feedback:</p>
+                      <div
+                        class="flex flex-col"
+                        th:text="*{applicantDetailsObj.feedback}"
+                      ></div>
+
+                      <div
+                        class="w-full mt-4"
+                        th:if="*{applicantDetailsObj.totalRating} >= 60 "
+                      >
+                        <hr class="mb-4" />
+                        <div class="text-xs">Click image to view</div>
+                        <div class="images">
+                          <img
+                            id="myImage"
+                            th:src="@{/view/image/} + *{applicantDetailsObj.certificateName}"
+                            alt="certificate"
+                            height="200"
+                          />
+                        </div>
+                        <div class="px-4 pt-2 flex justify-center">
+                          <button
+                            id="downloadButton"
+                            class="text-sm hover:underline border-blue-500 border-2 rounded-md p-2 w-[50%] hover:bg-blue-500 hover:text-white text-blue-500"
+                          >
+                            Download as PDF
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- progress bar -->
+          <div class="w-full pr-44 mt-8">
+            <div class="progress-container flex justify-center h-20 flex-col">
+              <div
+                class="pointer-events-none flex flex-wrap justify-evenly px-36"
+              >
+                <div>
+                  <img
+                    th:src="@{/icons/operationsOfficer.svg}"
+                    alt="Example SVG"
+                    class="h-10"
+                  />
+                </div>
+                <div>
+                  <img
+                    th:src="@{/icons/tbiBoard.svg}"
+                    alt="Example SVG"
+                    class="h-10"
+                  />
+                </div>
+                <div>
+                  <img
+                    th:src="@{/icons/completed.svg}"
+                    alt="Example SVG"
+                    class="h-8"
+                  />
+                </div>
+              </div>
+
+              <div class="progress w-w50 place-self-center">
+                <div
+                  class="progress-bar bg-black text-customyellow"
+                  role="progressbar"
+                  th:style="*{applicantDetailsObj.status == 1 OR applicantDetailsObj.status== 3 ? 'width: 33%;' : applicantDetailsObj.status == 4 ? 'width: 66%; padding-right: 63px; text-align: right; ' : 'width: 100%; padding-right: 30px; text-align: right; '}"
+                  aria-valuenow="33"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  th:text="*{applicantDetailsObj.status == 1 OR applicantDetailsObj.status == 3 ? 'In officer' : applicantDetailsObj.status == 4 ? 'In board' : 'Completed'}"
+                >
+                  [in officer]
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- form h-[480px]-->
+        <!-- <div
+          class="flex justify-center bg-white rounded-lg overflow-hidden border"
+        >
+          <div class="overflow-auto rounded-2xl h-[480px]">
+            <div
+              class="w-full"
+              th:replace="~{fragments/applicationDetails :: applicationDetails}"
+            ></div>
+          </div>
+        </div> -->
+      </div>
+      <div class="flex-grow overflow-hidden mb-10 rounded-lg">
+        <div class="h-full overflow-auto">
+          <div>
+            <div
+              th:replace="~{fragments/applicationDetails :: applicationDetails}"
+            ></div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="bottom-0 right-0 px-2 mr-12 mb-1 flex justify-end text-base font-primary absolute bg-customyellow text-black rounded-sm"
+      >
+        <form th:action="@{/logout}" method="POST">
+          <button class="hover:text-white">Logout</button>
+        </form>
+      </div>
+    </div>
+    <div
+      tabindex="-1"
+      role="dialog"
+      class="modal flex w-full backdrop-blur-sm"
+      style="backdrop-filter: blur(3px)"
+      id="changepassword-modal"
+      th:style="${session.initialChangePass} ? 'display: none;' : ''"
+    >
+      <div
+        class="modal-dialog modal-lg h-3/4 self-center flex w-full"
+        role="document"
+      >
+        <div class="modal-content bg-customyellow">
+          <div>
+            <button
+              type="button"
+              class="close w-8 hover:text-[#FEE902]"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <div>
+            <h5
+              class="modal-title w-full text-center font-primary text-3xl mb-6 mt-10"
+            >
+              Change Password
+            </h5>
+          </div>
+          <div class="modal-body flex justify-center relative">
+            <!-- <img
+              th:src="@{/images/plane.png}"
+              class="fixed mix-blend-overlay h-64 bottom-0 sm:fixed pointer-events-none top-72 right-1/4 mr-6 mt-16"
+            /> -->
+            <form th:action="@{/applicant/change-password}" method="POST">
+              <div class="flex justify-between flex-col">
+                <div class="flex flex-col justify-between h-60">
+                  <!-- Current Password -->
+                  <div>
+                    <div class="relative w-80 h-12">
+                      <input
+                        type="password"
+                        placeholder="Enter current password"
+                        name="currentPassword"
+                        id="currentPassword"
+                        class="indent-2 rounded-md h-12 w-full mb-6"
+                      />
+
+                      <button
+                        type="button"
+                        id="toggleCurrentPassword"
+                        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600"
+                        onclick="togglePasswordVisibility()"
+                      >
+                        <img
+                          id="eyeIconCurrent"
+                          src="/icons/eye-hide.svg"
+                          alt="Show Password"
+                          class="h-6 w-6"
+                        />
+                        <img
+                          id="eyeSlashIconCurrent"
+                          src="/icons/eye-show.svg"
+                          alt="Hide Password"
+                          class="h-6 w-6 hidden"
+                        />
+                      </button>
+                    </div>
+                    <div th:if="*{error != null}" class="h-6">
+                      <div
+                        th:each="err : *{error.currentPasswordError}"
+                        th:text="${err}"
+                        class="text-red-600 text-xs"
+                      ></div>
+                    </div>
+                  </div>
+
+                  <!-- New Password -->
+                  <div>
+                    <div class="relative w-80 h-12">
+                      <input
+                        type="password"
+                        placeholder="Enter new password"
+                        name="newPassword"
+                        id="newPassword"
+                        class="indent-2 rounded-md h-12 w-full mb-6"
+                      />
+                      <button
+                        type="button"
+                        id="toggleNewPassword"
+                        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600"
+                        onclick="toggleNewPasswordVisibility()"
+                      >
+                        <img
+                          id="eyeIconNew"
+                          src="/icons/eye-hide.svg"
+                          alt="Show Password"
+                          class="h-6 w-6"
+                        />
+                        <img
+                          id="eyeSlashIconNew"
+                          src="/icons/eye-show.svg"
+                          alt="Hide Password"
+                          class="h-6 w-6 hidden"
+                        />
+                      </button>
+                    </div>
+                    <div th:if="*{error != null}" class="h-6">
+                      <div
+                        th:each="err : *{error.newPasswordError}"
+                        th:text="${err}"
+                        class="text-red-600 text-xs"
+                      ></div>
+                    </div>
+                  </div>
+
+                  <!-- Confirm Password -->
+                  <div>
+                    <div class="relative w-80 h-12">
+                      <input
+                        type="password"
+                        placeholder="Enter confirm password"
+                        name="confirmPassword"
+                        id="confirmPassword"
+                        class="indent-2 rounded-md h-12 w-full mb-6"
+                      />
+                      <button
+                        type="button"
+                        id="toggleConfirmPassword"
+                        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600"
+                        onclick="toggleConfirmPasswordVisibility()"
+                      >
+                        <img
+                          id="eyeIconConfirm"
+                          src="/icons/eye-hide.svg"
+                          alt="Show Password"
+                          class="h-6 w-6"
+                        />
+                        <img
+                          id="eyeSlashIconConfirm"
+                          src="/icons/eye-show.svg"
+                          alt="Hide Password"
+                          class="h-6 w-6 hidden"
+                        />
+                      </button>
+                    </div>
+                  </div>
+                  <div th:if="*{error != null}" class="h-6">
+                    <div
+                      th:each="err : *{error.confirmPasswordError}"
+                      th:text="${err}"
+                      class="text-red-600 text-xs"
+                    ></div>
+                  </div>
+                </div>
+                <div class="rounded-3xl w-60 m-auto mt-5">
+                  <button
+                    class="hover:text-black text-gray-50 border-black font-secondary h-12 w-60 rounded-3xl hover:bg-[#FEE902] bg-gray-950"
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal" tabindex="-1" role="dialog" id="feedback-modal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div>
+            <div id="score"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+    <script>
+      // Wait for the DOM to load before accessing elements
+      document.addEventListener("DOMContentLoaded", () => {
+        const downloadButton = document.getElementById("downloadButton");
+        const image = document.getElementById("myImage");
+
+        if (downloadButton && image) {
+          downloadButton.addEventListener("click", () => {
+            const img = new Image();
+            img.src = image.src;
+            img.onload = function () {
+              const { jsPDF } = window.jspdf;
+              let doc = new jsPDF({
+                orientation: "l", // Force landscape orientation
+                unit: "px",
+                format: [this.width, this.height],
+              });
+              doc.addImage(this, "JPEG", 0, 0, this.width, this.height);
+              doc.save("downloaded-image.pdf");
+            };
+          });
+        }
+      });
+    </script>
+  </body>
+  <script
+    src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"
+  ></script>
+
+  <script th:inline="javascript">
+    const webDto = /*[[${applicantWebDto}]]*/ "";
+    console.log(webDto);
+    if (/*[[${session.initialChangePass}]]*/ "") {
+      $("#changepassword-modal").remove();
+    } else {
+      $("#changepassword-modal").modal("show");
+    }
+
+    $(".images img").click(function () {
+      $("#full-image").attr("src", $(this).attr("src"));
+      $("#image-viewer").show();
+    });
+
+    $("#image-viewer .close").click(function () {
+      $("#image-viewer").hide();
+    });
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const togglePasswordVisibility = (inputId, eyeIconId, eyeSlashIconId) => {
+        const input = document.getElementById(inputId);
+        const eyeIcon = document.getElementById(eyeIconId);
+        const eyeSlashIcon = document.getElementById(eyeSlashIconId);
+
+        eyeIcon.addEventListener("click", () => {
+          if (input.type === "password") {
+            input.type = "text";
+            eyeIcon.classList.add("hidden");
+            eyeSlashIcon.classList.remove("hidden");
+          } else {
+            input.type = "password";
+            eyeIcon.classList.remove("hidden");
+            eyeSlashIcon.classList.add("hidden");
+          }
+        });
+
+        eyeSlashIcon.addEventListener("click", () => {
+          if (input.type === "text") {
+            input.type = "password";
+            eyeIcon.classList.remove("hidden");
+            eyeSlashIcon.classList.add("hidden");
+          } else {
+            input.type = "text";
+            eyeIcon.classList.add("hidden");
+            eyeSlashIcon.classList.remove("hidden");
+          }
+        });
+      };
+
+      togglePasswordVisibility(
+        "currentPassword",
+        "eyeIconCurrent",
+        "eyeSlashIconCurrent"
+      );
+      togglePasswordVisibility("newPassword", "eyeIconNew", "eyeSlashIconNew");
+      togglePasswordVisibility(
+        "confirmPassword",
+        "eyeIconConfirm",
+        "eyeSlashIconConfirm"
+      );
+    });
+  </script>
+</html>
