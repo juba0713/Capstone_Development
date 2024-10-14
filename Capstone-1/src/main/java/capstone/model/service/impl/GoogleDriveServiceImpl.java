@@ -47,6 +47,8 @@ public class GoogleDriveServiceImpl  implements GoogleDriveService{
 	
 	private Drive driveService;
 	
+	private final String CREDENTIALS_FILE_PATH = "/etc/secrets/client_secret_1043115598106-4p08qcud5ccfosccf6q8hqov5cl5r0gu.apps.googleusercontent.com.json";
+	
 	
 	
 	@PostConstruct
@@ -119,7 +121,7 @@ public class GoogleDriveServiceImpl  implements GoogleDriveService{
 	  private  Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
 	      throws IOException {
 		  
-	  String CREDENTIALS_FILE_PATH = "/etc/secrets/client_secret_1043115598106-4p08qcud5ccfosccf6q8hqov5cl5r0gu.apps.googleusercontent.com.json";
+	  
 	    // Load client secrets.
 	    InputStream in = GoogleDriveService.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
 	    if (in == null) {
