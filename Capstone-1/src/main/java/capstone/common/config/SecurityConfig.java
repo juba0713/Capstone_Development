@@ -81,7 +81,8 @@ public class SecurityConfig {
 						.requestMatchers("/officer/**").hasAnyAuthority("OFFICER")
 						.requestMatchers("/manager/**").hasAnyAuthority("MANAGER")
 						.requestMatchers("/tbi-board/**").hasAnyAuthority("TBIBOARD")
-						.requestMatchers("/admin/**").hasAnyAuthority("ADMIN"))
+						.requestMatchers("/admin/**").hasAnyAuthority("ADMIN")
+						.requestMatchers("/callback").permitAll())
 				.formLogin((form) -> form
 						.loginPage("/login")
 						.permitAll()

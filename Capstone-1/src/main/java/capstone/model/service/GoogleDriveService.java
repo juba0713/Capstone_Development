@@ -18,4 +18,6 @@ public interface GoogleDriveService {
 	public void uploadPdfFile(MultipartFile file, String fileName);
 	
 	public void uploadCertificateFile(java.io.File file, String fileName);
+	
+	public void handleCallback(String code) throws GeneralSecurityException, IOException;
 }
