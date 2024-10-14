@@ -31,6 +31,7 @@ import java.security.GeneralSecurityException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,7 +42,12 @@ public class GoogleDriveServiceImpl  implements GoogleDriveService{
 	@Autowired
 	private Environment env;
 	
+	@Value("${google.service.port}")
+    private int googleServicePort;
+	
 	private Drive driveService;
+	
+	private  final String CREDENTIALS_FILE_PATH = "./secrets/credential.json";
 	
 	@PostConstruct
     public void init() {
@@ -53,6 +59,18 @@ public class GoogleDriveServiceImpl  implements GoogleDriveService{
             System.err.println("Error initializing Google Drive API: " + e.getMessage());
             e.printStackTrace();
         }
+        
+        System.out.println(googleServicePort);
+        
+        java.io.File file = new java.io.File("./secrets/text.txt");
+
+        if (file.exists()) {
+            System.out.println("File exists.");
+        } else {
+            System.out.println("File does not exist.");
+        }
+
+        
     }
 	
 	public Drive getDriveService() {
@@ -62,23 +80,23 @@ public class GoogleDriveServiceImpl  implements GoogleDriveService{
 	/**
 	   * Application name.
 	   */
-	  private static final String APPLICATION_NAME = "TestProject";
+	  private  final String APPLICATION_NAME = "TestProject";
 	  /**
 	   * Global instance of the JSON factory.
 	   */
-	  private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
+	  private  final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 	  /**
 	   * Directory to store authorization tokens for this application.
 	   */
-	  private static final String TOKENS_DIRECTORY_PATH = "tokens";
+	  private  final String TOKENS_DIRECTORY_PATH = "tokens";
 
 	  /**
 	   * Global instance of the scopes required by this quickstart.
 	   * If modifying these scopes, delete your previously saved tokens/ folder.
 	   */
-	  private static final List<String> SCOPES =
+	  private  final List<String> SCOPES =
 	      Collections.singletonList(DriveScopes.DRIVE_FILE);
-	  private static final String CREDENTIALS_FILE_PATH = "./client_secret_1043115598106-4p08qcud5ccfosccf6q8hqov5cl5r0gu.apps.googleusercontent.com.json";
+
 
 	  /**
 	   * Creates an authorized Credential object.
@@ -87,7 +105,7 @@ public class GoogleDriveServiceImpl  implements GoogleDriveService{
 	   * @return An authorized Credential object.
 	   * @throws IOException If the credentials.json file cannot be found.
 	   */
-	  private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
+	  private  Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
 	      throws IOException {
 	    // Load client secrets.
 	    InputStream in = GoogleDriveService.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
@@ -103,7 +121,7 @@ public class GoogleDriveServiceImpl  implements GoogleDriveService{
 	        .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
 	        .setAccessType("offline")
 	        .build();
-	    LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
+	    LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(googleServicePort).build();
 	    Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
 	    //returns an authorized Credential object.
 	    return credential;
