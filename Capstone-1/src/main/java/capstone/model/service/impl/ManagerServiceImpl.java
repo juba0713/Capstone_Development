@@ -646,32 +646,32 @@ public class ManagerServiceImpl implements ManagerService {
 		System.out.println(folderPath);
 		try {
 			// Load the image
-			File imageFile = new File(folderPath + "base_certificate");
+			File imageFile = new File(folderPath + "base_certificate.png");
 			System.out.println("TRY IN");
 			if(imageFile.exists()) {
 				System.out.println("FILE SYSTEM");
 			}
 			
 			BufferedImage image = ImageIO.read(imageFile);
-
+			System.out.println("TRY IN 1");
 			Graphics g = image.getGraphics();
 
 			g.setFont(new Font("Leelawadee UI Semilight", Font.BOLD, 130));
 			g.setColor(new Color(253, 204, 1));
-
+			System.out.println("TRY IN 2");
 			String fullName = userCertificate.getFirstName() + " " + userCertificate.getLastName();
 			int x = 132;
 			int y = 760;
 			g.drawString(fullName, x, y);
 
 			g.dispose();
-
+			System.out.println("TRY IN 3");
 			String fileName = "certificate_" + userCertificate.getUserIdPk();
 			File outputFile = new File(folderPath + fileName + ".png");
 			ImageIO.write(image, "png", outputFile);
-
+			System.out.println("TRY IN 4");
 			applicantLogic.updateApplicantCeritificate(fileName, inDto.getApplicantIdPk());
-			
+			System.out.println("TRY IN 5" );
 			emailService.sendIssuedCertificate(userCertificate.getEmail());
 			
 		} catch (IOException e) {
