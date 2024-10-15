@@ -327,9 +327,11 @@ public class ManagerController {
 		ManagerInOutDto outDto = managerService.issuedCertificate(inDto);
 		
 		if(CommonConstant.INVALID.equals(outDto.getResult())) {
+			System.out.println("There's a problem issuing a certificate!");
 			ra.addFlashAttribute("errorMsg", "There's a problem issuing a certificate!");
 			return "redirect:/manager/evaluated-result";
 		}
+		System.out.println("A certificate has been issued!");
 		ra.addFlashAttribute("successMsg", "A certificate has been issued");
 		return "redirect:/manager/evaluated-result";
 	}
