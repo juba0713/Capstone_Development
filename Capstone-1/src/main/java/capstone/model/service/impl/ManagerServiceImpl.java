@@ -19,6 +19,7 @@ import javax.imageio.ImageIO;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.SimpleMailMessage;
@@ -645,10 +646,11 @@ public class ManagerServiceImpl implements ManagerService {
 		
 		System.out.println(folderPath);
 		try {
+			ClassPathResource resource = new ClassPathResource("static/images/base_certificate.png");
 			// Load the image
-			File imageFile = new File("./certs/base_certificate.png");
+			File imageFile = resource.getFile();
 			System.out.println("TRY IN");
-			if(imageFile.exists()) {
+			if(resource.getFile().exists()) {
 				System.out.println("FILE SYSTEM");
 			}
 			
