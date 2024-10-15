@@ -642,10 +642,11 @@ public class ManagerServiceImpl implements ManagerService {
 	if (userCertificate.getTotalRating() >= 60) {
 
 		String folderPath = env.getProperty("new.certificate.path").toString();
-
+		
+		System.out.println(folderPath);
 		try {
 			// Load the image
-			File imageFile = new File(folderPath + "base_certificate.png");
+			File imageFile = new File(folderPath + "base_certificate");
 			System.out.println("TRY IN");
 			if(imageFile.exists()) {
 				System.out.println("FILE SYSTEM");
