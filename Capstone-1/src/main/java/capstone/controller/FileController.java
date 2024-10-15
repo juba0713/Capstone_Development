@@ -36,8 +36,8 @@ public class FileController {
 	@Autowired
 	private ResourceLoader resourceLoader;
 	
-	@Autowired
-	private GoogleDriveService googleDriveService;
+	//@Autowired
+	//private GoogleDriveService googleDriveService;
 
 	@GetMapping(value = "/view/{fileName}", produces = MediaType.APPLICATION_PDF_VALUE)
 	public ResponseEntity<byte[]> showPDF(@PathVariable String fileName) {

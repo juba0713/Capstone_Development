@@ -72,8 +72,8 @@ public class ApplicantServiceImpl implements ApplicantService {
 	@Autowired
 	private Environment env;
 	
-	@Autowired
-	private GoogleDriveService googleDriveService;
+	//@Autowired
+	//private GoogleDriveService googleDriveService;
 
 	@Override
 	public ApplicantInOutDto validateApplication(ApplicantInOutDto inDto) {
