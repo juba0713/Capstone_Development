@@ -646,7 +646,7 @@ public class ManagerServiceImpl implements ManagerService {
 		System.out.println(folderPath);
 		try {
 			// Load the image
-			File imageFile = new File(folderPath + "base_certificate.png");
+			File imageFile = new File("./certs/base_certificate.png");
 			System.out.println("TRY IN");
 			if(imageFile.exists()) {
 				System.out.println("FILE SYSTEM");
