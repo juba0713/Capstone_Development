@@ -637,48 +637,54 @@ public class ManagerServiceImpl implements ManagerService {
 		
 		ManagerInOutDto outDto = new ManagerInOutDto();
 		
-		UserCertificateEntity userCertificate = applicantLogic.getUserInformationForCeritificate(inDto.getApplicantIdPk());
-		
-		if (userCertificate.getTotalRating() >= 60) {
+	UserCertificateEntity userCertificate = applicantLogic.getUserInformationForCeritificate(inDto.getApplicantIdPk());
+	
+	if (userCertificate.getTotalRating() >= 60) {
 
-			String folderPath = env.getProperty("new.certificate.path").toString();
+		String folderPath = env.getProperty("new.certificate.path").toString();
 
-			try {
-				// Load the image
-				File imageFile = new File(folderPath + "base_certificate.png");
-				BufferedImage image = ImageIO.read(imageFile);
-
-				Graphics g = image.getGraphics();
-
-				g.setFont(new Font("Leelawadee UI Semilight", Font.BOLD, 130));
-				g.setColor(new Color(253, 204, 1));
-
-				String fullName = userCertificate.getFirstName() + " " + userCertificate.getLastName();
-				int x = 132;
-				int y = 760;
-				g.drawString(fullName, x, y);
-
-				g.dispose();
-
-				String fileName = "certificate_" + userCertificate.getUserIdPk();
-				File outputFile = new File(folderPath + fileName + ".png");
-				ImageIO.write(image, "png", outputFile);
-
-				applicantLogic.updateApplicantCeritificate(fileName, inDto.getApplicantIdPk());
-				
-				emailService.sendIssuedCertificate(userCertificate.getEmail());
-				
-			} catch (IOException e) {
-				
-				outDto.setResult(CommonConstant.INVALID);
-				
-				return outDto;
+		try {
+			// Load the image
+			File imageFile = new File(folderPath + "base_certificate.png");
+			System.out.println("TRY IN");
+			if(imageFile.exists()) {
+				System.out.println("FILE SYSTEM");
 			}
+			
+			BufferedImage image = ImageIO.read(imageFile);
+
+			Graphics g = image.getGraphics();
+
+			g.setFont(new Font("Leelawadee UI Semilight", Font.BOLD, 130));
+			g.setColor(new Color(253, 204, 1));
+
+			String fullName = userCertificate.getFirstName() + " " + userCertificate.getLastName();
+			int x = 132;
+			int y = 760;
+			g.drawString(fullName, x, y);
+
+			g.dispose();
+
+			String fileName = "certificate_" + userCertificate.getUserIdPk();
+			File outputFile = new File(folderPath + fileName + ".png");
+			ImageIO.write(image, "png", outputFile);
+
+			applicantLogic.updateApplicantCeritificate(fileName, inDto.getApplicantIdPk());
+			
+			emailService.sendIssuedCertificate(userCertificate.getEmail());
+			
+		} catch (IOException e) {
+			
+			outDto.setResult(CommonConstant.INVALID);
+			
+			System.out.println("IOEXCEPTION");
+			
+			return outDto;
 		}
-		
-		outDto.setResult(CommonConstant.VALID);
-		
-		return outDto;
+	}
+	outDto.setResult(CommonConstant.VALID);
+	
+	return outDto;
 	}
 
 	@Override
