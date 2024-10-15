@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,5 +41,11 @@ public class OAuthController {
         } catch (Exception e) {
             return "Authorization failed: " + e.getMessage();
         }
+    }
+    
+    @GetMapping("/authorize")
+    public String authorize() throws IOException, GeneralSecurityException {
+        // Redirect the user to the OAuth authorization page
+        return "redirect:" + googleDriveService.getAuthorizationUrl();
     }
 }

@@ -41,147 +41,131 @@ import org.springframework.web.multipart.MultipartFile;
 public class GoogleDriveServiceImpl  implements GoogleDriveService{
 	
 	@Autowired
-    private Environment env;
+	private final Environment env;
 
-    @Value("${google.service.port}")
-    private int googleServicePort;
+    // Inject properties
+    @Value("${google.credentials.file}")
+    private String CREDENTIALS_FILE_PATH;
+
+    @Value("${google.tokens.directory.path}")
+    private String TOKENS_DIRECTORY_PATH;
+
+    @Value("${google.application.name}")
+    private String APPLICATION_NAME;
+
+    @Value("${google.oauth.redirectUri}")
+    private String REDIRECT_URI;
+
+    private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
+
+    private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE_FILE);
 
     private Drive driveService;
 
-	/**
-	   * Application name.
-	   */
-	  private  final String APPLICATION_NAME = "TestProject";
-	  /**
-	   * Global instance of the JSON factory.
-	   */
-	  private  final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-	  /**
-	   * Directory to store authorization tokens for this application.
-	   */
-	  private  final String TOKENS_DIRECTORY_PATH = "tokens";
+    private GoogleAuthorizationCodeFlow flow;
 
-	  /**
-	   * Global instance of the scopes required by this quickstart.
-	   * If modifying these scopes, delete your previously saved tokens/ folder.
-	   */
-	  private  final List<String> SCOPES =
-	      Collections.singletonList(DriveScopes.DRIVE_FILE);
-	  
-	    private final String CREDENTIALS_FILE_PATH = "/etc/secrets/credential.json";
-
-	
-    public Drive getDriveService() {
-        return driveService;
+    public GoogleDriveServiceImpl(Environment env) {
+        this.env = env;
     }
-	
-	
+
     @PostConstruct
     public void init() {
         try {
-            System.out.println("Google Drive API service not initialized yet.");
+            final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+
+            // Load client secrets.
+            GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(new FileInputStream(CREDENTIALS_FILE_PATH)));
+
+            // Build flow and trigger user authorization request.
+            flow = new GoogleAuthorizationCodeFlow.Builder(
+                    HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
+                    .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
+                    .setAccessType("offline")
+                    .build();
+
+            System.out.println("Google Drive Service initialized.");
         } catch (Exception e) {
-            System.err.println("Error initializing Google Drive API: " + e.getMessage());
+            System.err.println("Error initializing Google Drive Service: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-	  /**
-	   * Creates an authorized Credential object.
-	   *
-	   * @param HTTP_TRANSPORT The network HTTP Transport.
-	   * @return An authorized Credential object.
-	   * @throws IOException If the credentials.json file cannot be found.
-	   */
-	  private Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT, String authorizationCode)
-	            throws IOException {
+    @Override
+    public String getAuthorizationUrl() throws IOException, GeneralSecurityException {
+        return flow.newAuthorizationUrl()
+                .setRedirectUri(REDIRECT_URI)
+                .build();
+    }
 
-	        // Load client secrets from file system
-	        FileInputStream fileInputStream = new FileInputStream(CREDENTIALS_FILE_PATH);
-	        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(fileInputStream));
+    @Override
+    public void handleCallback(String code) throws IOException, GeneralSecurityException {
+        GoogleTokenResponse tokenResponse = flow.newTokenRequest(code)
+                .setRedirectUri(REDIRECT_URI)
+                .execute();
 
-	        // Build flow and trigger user authorization request
-	        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-	                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-	                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
-	                .setAccessType("offline") // Use "offline" to get refresh tokens
-	                .build();
+        Credential credential = flow.createAndStoreCredential(tokenResponse, "user");
+        driveService = new Drive.Builder(GoogleNetHttpTransport.newTrustedTransport(), JSON_FACTORY, credential)
+                .setApplicationName(APPLICATION_NAME)
+                .build();
 
-	        // Exchange the authorization code for an access token
-	        GoogleTokenResponse tokenResponse = flow.newTokenRequest(authorizationCode)
-	                .setRedirectUri("https://capstone-development-vbli.onrender.com/callback") // Update this to your deployed URI
-	                .execute();
+        System.out.println("Google Drive API authorized and ready.");
+    }
 
-	        return flow.createAndStoreCredential(tokenResponse, "user");
-	    }
+    @Override
+    public Drive getDriveService() {
+        return driveService;
+    }
 
-	  public Drive getInstance(String authorizationCode) throws GeneralSecurityException, IOException {
-	        // Build a new authorized API client service.
-	        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-	        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT, authorizationCode))
-	                .setApplicationName(APPLICATION_NAME)
-	                .build();
-	        return service;
-	    }
-	  
-	  public String getAuthorizationUrl() throws IOException, GeneralSecurityException {
-	        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-	        FileInputStream fileInputStream = new FileInputStream(CREDENTIALS_FILE_PATH);
-	        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(fileInputStream));
+    @Override
+    public FileList listFiles() throws IOException {
+        if (driveService == null) {
+            throw new IOException("Google Drive service is not initialized.");
+        }
 
-	        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-	                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-	                .setAccessType("offline")
-	                .build();
-
-	        // Generate the URL for the user to authorize
-	        return flow.newAuthorizationUrl()
-	                .setRedirectUri("https://capstone-development-vbli.onrender.com/callback") // Update to your deployed URI
-	                .build();
-	    }
-
-	    // Endpoint to handle the callback from Google
-	  @Override
-	    public void handleCallback(String code) throws GeneralSecurityException, IOException {
-	        this.driveService = getInstance(code);
-	        System.out.println("Google Drive API authorized and ready after callback.");
-	    }
+        FileList result = driveService.files().list()
+                .setPageSize(10)
+                .setFields("nextPageToken, files(id, name)")
+                .execute();
+        return result;
+    }
 	  
 	  
 	  
 	  public InputStream  getFileContentByName(String fileName, Boolean isPdf) throws IOException, GeneralSecurityException {
 		  
-		// Retrieve the folder ID from properties
-		    String folderId;
-
-		    // Check if we are dealing with PDFs or certificates
-		    if (isPdf) {
-		        folderId = env.getProperty("pdf.folder.id"); // ID for the pdfs folder
-		    } else {
-		        System.out.println("CERTIFICATE");
-		        folderId = env.getProperty("certificate.folder.id"); // ID for the certificate folder
-		    }
-
-		    Drive service = getInstance("sda");
-
-		    // Search for the file by name within the specified folder
-		    String query = "name = '" + fileName + "' and '" + folderId + "' in parents";
-		    FileList result = service.files().list()
-		            .setQ(query)
-		            .setSpaces("drive")
-		            .setFields("files(id, name)")
-		            .execute();
-
-		    List<File> files = result.getFiles();
-
-		    if (files == null || files.isEmpty()) {
-		        return null; // No files found
-		    } else {
-		        File file = files.get(0); // Get the first matching file
-
-		        // Return the InputStream for the file's content
-		        return service.files().get(file.getId()).executeMediaAsInputStream();
-		    }
+//		// Retrieve the folder ID from properties
+//		    String folderId;
+//
+//		    // Check if we are dealing with PDFs or certificates
+//		    if (isPdf) {
+//		        folderId = env.getProperty("pdf.folder.id"); // ID for the pdfs folder
+//		    } else {
+//		        System.out.println("CERTIFICATE");
+//		        folderId = env.getProperty("certificate.folder.id"); // ID for the certificate folder
+//		    }
+//
+//		    Drive service = getInstance();
+//
+//		    // Search for the file by name within the specified folder
+//		    String query = "name = '" + fileName + "' and '" + folderId + "' in parents";
+//		    FileList result = service.files().list()
+//		            .setQ(query)
+//		            .setSpaces("drive")
+//		            .setFields("files(id, name)")
+//		            .execute();
+//
+//		    List<File> files = result.getFiles();
+//
+//		    if (files == null || files.isEmpty()) {
+//		        return null; // No files found
+//		    } else {
+//		        File file = files.get(0); // Get the first matching file
+//
+//		        // Return the InputStream for the file's content
+//		        return service.files().get(file.getId()).executeMediaAsInputStream();
+//		    }
+		  
+		  return null;
 		  }
 
 
